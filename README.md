@@ -5,6 +5,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Status: In Development](https://img.shields.io/badge/Status-In%20Development-blue.svg)]()
 
+**📋 [View Implementation Plan](./IMPLEMENTATION_PLAN.md)** - Detailed technical roadmap with technology stack, phases, and timelines
+
 ## Table of Contents
 
 - [About](#about)
@@ -353,9 +355,27 @@ engine.subscribe('DISCOVERY', callback)
 
 ## Getting Started
 
+> **Note**: This project is in the design phase. Implementation has not yet begun.
+> See the [Implementation Plan](./IMPLEMENTATION_PLAN.md) for the complete technical roadmap.
+
+### Technology Stack
+
+The game will be built using:
+- **TypeScript 5.x** - Type-safe development
+- **PixiJS 8.x** - High-performance 2D rendering (WebGL)
+- **React 18.x** - UI component framework
+- **Matter.js** - 2D physics engine
+- **Zustand** - Lightweight state management
+- **Vite** - Fast build tooling
+- **Howler.js** - Cross-browser audio
+
+See [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) for detailed technology choices and architecture.
+
 ### Prerequisites
 
-(To be added as technology stack is determined)
+- Node.js 20+ and pnpm 8+
+- Modern browser with WebGL support
+- Git for version control
 
 ### Installation
 
@@ -366,14 +386,27 @@ git clone https://github.com/MarkusWalk/AmazonVibeTrail.git
 # Navigate to project directory
 cd AmazonVibeTrail
 
-# Install dependencies
-# (commands to be added)
+# Install dependencies (once implementation begins)
+pnpm install
+
+# Run development server
+pnpm dev
 ```
 
 ### Running the Game
 
 ```bash
-# (commands to be added)
+# Development mode with hot reload
+pnpm dev
+
+# Build for production
+pnpm build
+
+# Preview production build
+pnpm preview
+
+# Run tests
+pnpm test
 ```
 
 ---
