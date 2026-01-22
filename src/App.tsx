@@ -91,6 +91,10 @@ function App() {
       fontSize: 20,
       fill: 0xffff00,
     })
+    renderer.addText('location', 'Location: Belém', 10, 165, {
+      fontSize: 16,
+      fill: 0x87ceeb,
+    })
     renderer.addText('controls', 'Controls: WASD or Arrow Keys', 10, 570, {
       fontSize: 14,
       fill: 0xcccccc,

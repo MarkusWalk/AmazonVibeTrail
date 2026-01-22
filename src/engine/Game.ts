@@ -6,7 +6,10 @@ import {
   Collectible,
   CollectibleType,
   Whirlpool,
+  Fork,
 } from './entities'
+import { NavigationManager } from './navigation'
+import { amazonRiverMap } from '@data/maps/amazonRiver'
 import type { PixiRenderer } from '@rendering/pixi'
 import type { GameConfig } from '@models/index'
 
@@ -19,11 +22,13 @@ export class Game {
   private renderer: PixiRenderer | null = null
   private inputRouter: InputRouter
   private player: Player | null = null
+  private navigationManager: NavigationManager
 
   // Game state
   private score: number = 0
   private gameTime: number = 0
   private difficultyMultiplier: number = 1
+  private currentFork: Fork | null = null
 
   // Spawn timers
   private obstacleSpawnTimer: number = 0
@@ -40,7 +45,10 @@ export class Game {
     this.inputRouter = new InputRouter()
     this.setupInputHandlers()
 
-    console.log('[Game] Initialized')
+    // Initialize navigation with Amazon River map
+    this.navigationManager = new NavigationManager(amazonRiverMap, 'belem')
+
+    console.log('[Game] Initialized with navigation system')
   }
 
   /**
@@ -80,10 +88,13 @@ export class Game {
       this.handleCollision(entityAId, entityBId)
     })
 
+    // Start navigation - set first target
+    this.navigationManager.setTarget('breves')
+
     // Start engine
     this.engine.start()
 
-    console.log('[Game] Started')
+    console.log('[Game] Started with navigation to Breves')
   }
 
   /**
@@ -254,6 +265,42 @@ export class Game {
   }
 
   /**
+   * Spawn a fork (river branch choice)
+   */
+  private spawnFork(choices: any[]): void {
+    if (!this.renderer) return
+
+    const { width } = this.renderer.getDimensions()
+
+    // Create fork at top of screen
+    const id = `fork_${Date.now()}`
+    const fork = new Fork(id, { x: width / 2, y: -150 }, choices)
+
+    // Create physics body (sensor - doesn't collide)
+    const physics = this.engine.getPhysics()
+    const body = physics.createCircleBody(id, width / 2, -150, 80, {
+      frictionAir: 0.005,
+      density: 0.001,
+      isSensor: true,
+    })
+
+    physics.setVelocity(id, { x: 0, y: 1.0 })
+
+    fork.setPhysicsBody(body)
+
+    // Add to engine
+    this.engine.addEntity(fork)
+
+    // Create sprite
+    this.renderer.createEntitySprite(fork, 'entities')
+
+    // Store reference
+    this.currentFork = fork
+
+    console.log('[Game] Fork spawned with', choices.length, 'choices')
+  }
+
+  /**
    * Handle collision events
    */
   private handleCollision(entityAId: string, entityBId: string): void {
@@ -350,6 +397,40 @@ export class Game {
           }
         }
       })
+
+      // Apply river current
+      const current = this.navigationManager.getCurrentFlow()
+      if (current.x !== 0 || current.y !== 0) {
+        physics.applyForce('player', {
+          x: current.x * 0.1,
+          y: current.y * 0.1,
+        })
+      }
+
+      // Update navigation progress based on distance traveled
+      const playerSpeed = this.player.getCurrentSpeed()
+      this.navigationManager.update(playerSpeed * (deltaTime / 1000))
+
+      // Check for upcoming forks and spawn fork entity if needed
+      const upcomingFork = this.navigationManager.getUpcomingFork()
+      if (upcomingFork && !this.currentFork) {
+        this.spawnFork(upcomingFork)
+      }
+
+      // Auto-choose fork if player didn't decide and fork passed
+      if (this.currentFork && this.currentFork.getPosition().y > 500) {
+        if (!this.currentFork.isChoiceMade()) {
+          this.currentFork.autoSelect()
+          const choice = this.currentFork.getSelectedChoice()
+          if (choice) {
+            this.navigationManager.chooseFork(choice.segmentId)
+          }
+        }
+        // Remove old fork
+        this.renderer.removeEntitySprite(this.currentFork.id)
+        this.engine.removeEntity(this.currentFork.id)
+        this.currentFork = null
+      }
     }
 
     // Update all entity sprites
@@ -380,6 +461,22 @@ export class Game {
       'speed',
       `Speed: ${stats.speed.toFixed(1)} m/s`
     )
+
+    // Update navigation display
+    const navState = this.navigationManager.getState()
+    const currentNode = this.navigationManager.getCurrentNode()
+    if (currentNode) {
+      this.renderer.updateText('location', `Location: ${currentNode.name}`)
+    } else if (navState.targetNodeId) {
+      const targetNode = this.navigationManager.getNode(navState.targetNodeId)
+      const progress = Math.floor(navState.progressPercent)
+      if (targetNode) {
+        this.renderer.updateText(
+          'location',
+          `→ ${targetNode.name} (${progress}%)`
+        )
+      }
+    }
 
     // Remove off-screen entities and award points
     const { height } = this.renderer.getDimensions()

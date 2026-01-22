@@ -167,6 +167,29 @@ export class PixiRenderer {
 
       graphics.rect(-25, 6, 50, 2)
       graphics.fill({ color: 0x4a3015, alpha: 0.5 })
+    } else if (className === 'Fork') {
+      // Draw a fork indicator with arrows
+      // Center circle
+      graphics.circle(0, 0, 40)
+      graphics.fill({ color: 0xffff00, alpha: 0.7 })
+
+      // Arrow pointing left
+      graphics.moveTo(-50, 0)
+      graphics.lineTo(-70, -15)
+      graphics.lineTo(-70, 15)
+      graphics.lineTo(-50, 0)
+      graphics.fill({ color: 0xffff00 })
+
+      // Arrow pointing right
+      graphics.moveTo(50, 0)
+      graphics.lineTo(70, -15)
+      graphics.lineTo(70, 15)
+      graphics.lineTo(50, 0)
+      graphics.fill({ color: 0xffff00 })
+
+      // Text indicator "FORK" (will be rendered as texture)
+      graphics.circle(0, 0, 30)
+      graphics.fill({ color: 0x333333, alpha: 0.8 })
     } else {
       // Default shape
       graphics.rect(-10, -10, 20, 20)
