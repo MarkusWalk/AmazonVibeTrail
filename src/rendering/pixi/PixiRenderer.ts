@@ -106,32 +106,71 @@ export class PixiRenderer {
   private createEntityGraphics(entity: Entity): PIXI.Graphics {
     const graphics = new PIXI.Graphics()
 
-    switch (entity.type) {
-      case 'PLAYER':
-        // Draw a canoe shape
-        graphics.rect(-20, -40, 40, 80)
-        graphics.fill({ color: 0x8b4513 }) // Brown canoe
-        // Add a paddle indicator
-        graphics.rect(-5, -50, 10, 20)
-        graphics.fill({ color: 0x654321 })
-        break
+    // Check for specific entity class names
+    const className = entity.constructor.name
 
-      case 'OBSTACLE':
-        // Draw a log/rock
-        graphics.circle(0, 0, 25)
-        graphics.fill({ color: 0x654321 }) // Dark brown
-        break
+    if (className === 'Player') {
+      // Draw a more detailed canoe shape
+      graphics.moveTo(0, -45)
+      graphics.lineTo(-18, 35)
+      graphics.lineTo(0, 40)
+      graphics.lineTo(18, 35)
+      graphics.lineTo(0, -45)
+      graphics.fill({ color: 0x8b4513 }) // Brown canoe
 
-      case 'COLLECTIBLE':
-        // Draw a star for collectibles
-        graphics.star(0, 0, 5, 15, 10)
-        graphics.fill({ color: 0xffff00 }) // Yellow
-        break
+      // Add decoration stripe
+      graphics.rect(-15, -10, 30, 4)
+      graphics.fill({ color: 0x654321 })
 
-      default:
-        // Default shape
-        graphics.rect(-10, -10, 20, 20)
-        graphics.fill({ color: 0xff0000 })
+      // Paddle indicator
+      graphics.rect(-5, -55, 10, 15)
+      graphics.fill({ color: 0x654321 })
+    } else if (className === 'Whirlpool') {
+      // Draw a whirlpool effect (spiral)
+      graphics.circle(0, 0, 50)
+      graphics.fill({ color: 0x1e5a8e, alpha: 0.6 })
+
+      graphics.circle(0, 0, 35)
+      graphics.fill({ color: 0x2e7ab8, alpha: 0.7 })
+
+      graphics.circle(0, 0, 20)
+      graphics.fill({ color: 0x4a90d4, alpha: 0.8 })
+
+      // Center vortex
+      graphics.circle(0, 0, 10)
+      graphics.fill({ color: 0x0a2a4e })
+    } else if (className === 'Collectible') {
+      // Different collectible types have different visuals
+      // Fish
+      graphics.ellipse(0, 0, 15, 10)
+      graphics.fill({ color: 0xff8c00 }) // Orange fish
+
+      // Tail
+      graphics.moveTo(15, 0)
+      graphics.lineTo(22, -8)
+      graphics.lineTo(22, 8)
+      graphics.lineTo(15, 0)
+      graphics.fill({ color: 0xff6600 })
+
+      // Eye
+      graphics.circle(-8, -3, 2)
+      graphics.fill({ color: 0x000000 })
+    } else if (className === 'Obstacle') {
+      // Default obstacle - log/rock
+      // Make it look like a floating log
+      graphics.roundRect(-30, -12, 60, 24, 6)
+      graphics.fill({ color: 0x654321 })
+
+      // Wood grain lines
+      graphics.rect(-28, -2, 56, 2)
+      graphics.fill({ color: 0x4a3015, alpha: 0.5 })
+
+      graphics.rect(-25, 6, 50, 2)
+      graphics.fill({ color: 0x4a3015, alpha: 0.5 })
+    } else {
+      // Default shape
+      graphics.rect(-10, -10, 20, 20)
+      graphics.fill({ color: 0xff0000 })
     }
 
     return graphics

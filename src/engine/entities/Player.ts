@@ -15,7 +15,20 @@ export class Player extends Entity {
 
   // Player stats
   private health: number = 100
+  private maxHealth: number = 100
+  private lives: number = 3
   private isDamaged: boolean = false
+
+  // Tracking stats
+  private distanceTraveled: number = 0
+  private combo: number = 0
+  private maxCombo: number = 0
+  private obstaclesAvoided: number = 0
+  private collectiblesGathered: number = 0
+
+  // Power-up effects
+  private speedBoostTimer: number = 0
+  private invincibilityTimer: number = 0
 
   constructor(id: string, position: Vector2D) {
     super(id, EntityType.PLAYER, position)
@@ -24,11 +37,27 @@ export class Player extends Entity {
   /**
    * Update player state
    */
-  update(_deltaTime: number): void {
+  update(deltaTime: number): void {
     if (!this.isActive) return
 
     // Sync with physics
     this.syncWithPhysics()
+
+    // Track distance traveled
+    const speed = this.getCurrentSpeed()
+    this.distanceTraveled += speed * (deltaTime / 1000)
+
+    // Update power-up timers
+    if (this.speedBoostTimer > 0) {
+      this.speedBoostTimer -= deltaTime
+      if (this.speedBoostTimer <= 0) {
+        this.maxSpeed = 5 // Reset to default
+      }
+    }
+
+    if (this.invincibilityTimer > 0) {
+      this.invincibilityTimer -= deltaTime
+    }
 
     // Reset damage state after a brief moment
     if (this.isDamaged) {
@@ -113,8 +142,17 @@ export class Player extends Entity {
    * Handle collision with another entity
    */
   onCollision(other: Entity): void {
-    if (other.type === EntityType.OBSTACLE) {
+    // Handle collectibles
+    if (other.type === EntityType.COLLECTIBLE) {
+      this.collectItem()
+      return
+    }
+
+    // Handle obstacles (only if not invincible)
+    if (other.type === EntityType.OBSTACLE && !this.isInvincible()) {
       this.takeDamage(10)
+      this.breakCombo() // Break combo on hit
+
       // Apply knockback force
       const knockbackForce: Vector2D = {
         x: this.position.x - other.getPosition().x,
@@ -131,6 +169,11 @@ export class Player extends Entity {
           x: this.velocity.x + knockbackForce.x,
           y: this.velocity.y + knockbackForce.y,
         })
+      }
+
+      // Check if health is 0, lose a life
+      if (this.health <= 0 && this.lives > 0) {
+        this.loseLife()
       }
     }
   }
@@ -160,6 +203,143 @@ export class Player extends Entity {
    * Check if alive
    */
   isAlive(): boolean {
-    return this.health > 0
+    return this.health > 0 && this.lives > 0
+  }
+
+  /**
+   * Lose a life and respawn
+   */
+  loseLife(): boolean {
+    this.lives--
+    if (this.lives > 0) {
+      this.health = this.maxHealth
+      this.combo = 0
+      this.invincibilityTimer = 2000 // 2 seconds of invincibility
+      console.log(`[Player] Lost a life! Lives remaining: ${this.lives}`)
+      return true // Can respawn
+    }
+    return false // Game over
+  }
+
+  /**
+   * Get lives
+   */
+  getLives(): number {
+    return this.lives
+  }
+
+  /**
+   * Add a life
+   */
+  addLife(): void {
+    this.lives = Math.min(5, this.lives + 1) // Max 5 lives
+  }
+
+  /**
+   * Get distance traveled
+   */
+  getDistanceTraveled(): number {
+    return Math.floor(this.distanceTraveled)
+  }
+
+  /**
+   * Increment combo
+   */
+  incrementCombo(): void {
+    this.combo++
+    if (this.combo > this.maxCombo) {
+      this.maxCombo = this.combo
+    }
+  }
+
+  /**
+   * Break combo
+   */
+  breakCombo(): void {
+    this.combo = 0
+  }
+
+  /**
+   * Get current combo
+   */
+  getCombo(): number {
+    return this.combo
+  }
+
+  /**
+   * Get max combo
+   */
+  getMaxCombo(): number {
+    return this.maxCombo
+  }
+
+  /**
+   * Increment obstacles avoided
+   */
+  incrementObstaclesAvoided(): void {
+    this.obstaclesAvoided++
+    this.incrementCombo()
+  }
+
+  /**
+   * Get obstacles avoided
+   */
+  getObstaclesAvoided(): number {
+    return this.obstaclesAvoided
+  }
+
+  /**
+   * Collect item
+   */
+  collectItem(): void {
+    this.collectiblesGathered++
+  }
+
+  /**
+   * Get collectibles gathered
+   */
+  getCollectiblesGathered(): number {
+    return this.collectiblesGathered
+  }
+
+  /**
+   * Apply speed boost
+   */
+  applySpeedBoost(duration: number): void {
+    this.maxSpeed = 8
+    this.speedBoostTimer = duration
+    console.log(`[Player] Speed boost activated for ${duration}ms`)
+  }
+
+  /**
+   * Check if invincible
+   */
+  isInvincible(): boolean {
+    return this.invincibilityTimer > 0
+  }
+
+  /**
+   * Get all player stats
+   */
+  getStats(): {
+    health: number
+    lives: number
+    distance: number
+    combo: number
+    maxCombo: number
+    obstaclesAvoided: number
+    collectiblesGathered: number
+    speed: number
+  } {
+    return {
+      health: this.health,
+      lives: this.lives,
+      distance: this.getDistanceTraveled(),
+      combo: this.combo,
+      maxCombo: this.maxCombo,
+      obstaclesAvoided: this.obstaclesAvoided,
+      collectiblesGathered: this.collectiblesGathered,
+      speed: this.getCurrentSpeed(),
+    }
   }
 }

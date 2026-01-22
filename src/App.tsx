@@ -7,7 +7,14 @@ import './App.css'
 
 function App() {
   const [gameState, setGameState] = useState<GameState>(GameState.BOOT)
-  const [stats, setStats] = useState({ score: 0, health: 100 })
+  const [stats, setStats] = useState({
+    score: 0,
+    health: 100,
+    lives: 3,
+    distance: 0,
+    combo: 0,
+    speed: 0,
+  })
   const canvasContainerRef = useRef<HTMLDivElement>(null)
   const gameRef = useRef<Game | null>(null)
   const rendererRef = useRef<PixiRenderer | null>(null)
@@ -61,15 +68,31 @@ function App() {
 
     // Add UI text
     renderer.addText('score', 'Score: 0', 10, 10, {
-      fontSize: 20,
+      fontSize: 18,
       fill: 0xffffff,
     })
-    renderer.addText('health', 'Health: 100', 10, 40, {
-      fontSize: 20,
+    renderer.addText('health', 'Health: 100', 10, 35, {
+      fontSize: 18,
       fill: 0xffffff,
     })
-    renderer.addText('controls', 'Controls: WASD or Arrow Keys', 10, 70, {
-      fontSize: 16,
+    renderer.addText('lives', 'Lives: 3', 10, 60, {
+      fontSize: 18,
+      fill: 0xffffff,
+    })
+    renderer.addText('distance', 'Distance: 0m', 10, 85, {
+      fontSize: 18,
+      fill: 0xffffff,
+    })
+    renderer.addText('speed', 'Speed: 0.0 m/s', 10, 110, {
+      fontSize: 18,
+      fill: 0xffffff,
+    })
+    renderer.addText('combo', '', 10, 135, {
+      fontSize: 20,
+      fill: 0xffff00,
+    })
+    renderer.addText('controls', 'Controls: WASD or Arrow Keys', 10, 570, {
+      fontSize: 14,
       fill: 0xcccccc,
     })
 
@@ -88,10 +111,17 @@ function App() {
     // Update UI stats periodically
     const statsInterval = setInterval(() => {
       if (gameRef.current) {
-        setStats({
-          score: gameRef.current.getScore(),
-          health: gameRef.current.getPlayerHealth(),
-        })
+        const playerStats = gameRef.current.getPlayerStats()
+        if (playerStats) {
+          setStats({
+            score: gameRef.current.getScore(),
+            health: playerStats.health,
+            lives: playerStats.lives,
+            distance: playerStats.distance,
+            combo: playerStats.combo,
+            speed: playerStats.speed,
+          })
+        }
       }
     }, 100)
 
@@ -147,9 +177,12 @@ function App() {
               <h2>How to Play</h2>
               <ul>
                 <li>🛶 Use WASD or Arrow Keys to steer your canoe</li>
-                <li>🪵 Avoid obstacles floating down the river</li>
-                <li>❤️ Keep your health above zero</li>
-                <li>⭐ Score points for each obstacle you avoid</li>
+                <li>🪵 Avoid obstacles (logs, rocks, branches)</li>
+                <li>🌀 Whirlpools will pull you in and deal damage</li>
+                <li>🐟 Collect fish and items for bonuses</li>
+                <li>❤️ You have 3 lives - keep health above zero</li>
+                <li>⭐ Build combos for bonus points</li>
+                <li>🚀 Speed boosts make you temporarily faster</li>
               </ul>
             </div>
             <div className="menu-buttons">
@@ -173,11 +206,15 @@ function App() {
           <div className="river-screen">
             <div className="game-stats">
               <div className="stat">
-                <span className="stat-label">Score:</span>
+                <span className="stat-label">Score</span>
                 <span className="stat-value">{stats.score}</span>
               </div>
               <div className="stat">
-                <span className="stat-label">Health:</span>
+                <span className="stat-label">Lives</span>
+                <span className="stat-value">{'❤️'.repeat(stats.lives)}</span>
+              </div>
+              <div className="stat">
+                <span className="stat-label">Health</span>
                 <span
                   className="stat-value"
                   style={{
@@ -192,6 +229,18 @@ function App() {
                   {stats.health}
                 </span>
               </div>
+              <div className="stat">
+                <span className="stat-label">Distance</span>
+                <span className="stat-value">{stats.distance}m</span>
+              </div>
+              {stats.combo > 0 && (
+                <div className="stat combo">
+                  <span className="stat-label">Combo</span>
+                  <span className="stat-value" style={{ color: '#ffff00' }}>
+                    x{stats.combo}
+                  </span>
+                </div>
+              )}
             </div>
 
             <div className="game-canvas" ref={canvasContainerRef}></div>

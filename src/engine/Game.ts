@@ -1,5 +1,12 @@
 import { GameEngine, InputRouter } from './core'
-import { Player, Obstacle, ObstacleSubType } from './entities'
+import {
+  Player,
+  Obstacle,
+  ObstacleSubType,
+  Collectible,
+  CollectibleType,
+  Whirlpool,
+} from './entities'
 import type { PixiRenderer } from '@rendering/pixi'
 import type { GameConfig } from '@models/index'
 
@@ -15,8 +22,16 @@ export class Game {
 
   // Game state
   private score: number = 0
+  private gameTime: number = 0
+  private difficultyMultiplier: number = 1
+
+  // Spawn timers
   private obstacleSpawnTimer: number = 0
   private obstacleSpawnInterval: number = 2000 // ms
+  private collectibleSpawnTimer: number = 0
+  private collectibleSpawnInterval: number = 4000 // ms
+  private whirlpoolSpawnTimer: number = 0
+  private whirlpoolSpawnInterval: number = 15000 // ms
 
   constructor(config: GameConfig) {
     this.engine = new GameEngine(config)
@@ -62,7 +77,7 @@ export class Game {
 
     // Subscribe to collisions
     this.engine.subscribe('collision', (entityAId, entityBId) => {
-      console.log(`[Game] Collision: ${entityAId} <-> ${entityBId}`)
+      this.handleCollision(entityAId, entityBId)
     })
 
     // Start engine
@@ -111,7 +126,7 @@ export class Game {
   }
 
   /**
-   * Spawn an obstacle
+   * Spawn an obstacle with varied sizes and speeds
    */
   private spawnObstacle(): void {
     if (!this.renderer) return
@@ -121,11 +136,13 @@ export class Game {
     // Random horizontal position
     const x = Math.random() * (width - 100) + 50
 
-    // Random obstacle type
+    // Random obstacle type with weighted distribution
     const types = [
       ObstacleSubType.LOG,
+      ObstacleSubType.LOG, // More logs
       ObstacleSubType.ROCK,
       ObstacleSubType.BRANCH,
+      ObstacleSubType.BRANCH, // More branches
     ]
     const type = types[Math.floor(Math.random() * types.length)]
 
@@ -133,17 +150,22 @@ export class Game {
     const id = `obstacle_${Date.now()}_${Math.random()}`
     const obstacle = new Obstacle(id, { x, y: -50 }, type)
 
-    // Create physics body
+    // Create physics body with varied sizes
     const physics = this.engine.getPhysics()
-    const radius = type === ObstacleSubType.BRANCH ? 15 : 25
+    let radius = 25
+    if (type === ObstacleSubType.BRANCH) radius = 15
+    if (type === ObstacleSubType.ROCK) radius = 30
+
     const body = physics.createCircleBody(id, x, -50, radius, {
       frictionAir: 0.01,
       density: 0.005,
       isSensor: false,
     })
 
-    // Add downward velocity (river current)
-    physics.setVelocity(id, { x: 0, y: 1.5 })
+    // Add downward velocity (river current) with variation
+    const baseSpeed = 1.5 * this.difficultyMultiplier
+    const speedVariation = Math.random() * 0.5 - 0.25
+    physics.setVelocity(id, { x: 0, y: baseSpeed + speedVariation })
 
     obstacle.setPhysicsBody(body)
 
@@ -152,8 +174,137 @@ export class Game {
 
     // Create sprite
     this.renderer.createEntitySprite(obstacle, 'entities')
+  }
 
-    console.log(`[Game] Spawned ${type} obstacle at x:${x}`)
+  /**
+   * Spawn a collectible
+   */
+  private spawnCollectible(): void {
+    if (!this.renderer) return
+
+    const { width } = this.renderer.getDimensions()
+
+    // Random horizontal position
+    const x = Math.random() * (width - 100) + 50
+
+    // Random collectible type
+    const types = [
+      CollectibleType.FISH,
+      CollectibleType.FISH,
+      CollectibleType.HEALTH_PACK,
+      CollectibleType.SPEED_BOOST,
+    ]
+    const type = types[Math.floor(Math.random() * types.length)]
+
+    // Create collectible
+    const id = `collectible_${Date.now()}_${Math.random()}`
+    const collectible = new Collectible(id, { x, y: -50 }, type)
+
+    // Create physics body (sensor - doesn't collide physically)
+    const physics = this.engine.getPhysics()
+    const body = physics.createCircleBody(id, x, -50, 15, {
+      frictionAir: 0.005,
+      density: 0.001,
+      isSensor: true, // Pass through
+    })
+
+    physics.setVelocity(id, { x: 0, y: 1.2 })
+
+    collectible.setPhysicsBody(body)
+
+    // Add to engine
+    this.engine.addEntity(collectible)
+
+    // Create sprite
+    this.renderer.createEntitySprite(collectible, 'entities')
+  }
+
+  /**
+   * Spawn a whirlpool
+   */
+  private spawnWhirlpool(): void {
+    if (!this.renderer) return
+
+    const { width } = this.renderer.getDimensions()
+
+    // Random horizontal position
+    const x = Math.random() * (width - 200) + 100
+
+    // Create whirlpool
+    const id = `whirlpool_${Date.now()}`
+    const whirlpool = new Whirlpool(id, { x, y: -100 })
+
+    // Create physics body (larger sensor area)
+    const physics = this.engine.getPhysics()
+    const body = physics.createCircleBody(id, x, -100, 60, {
+      frictionAir: 0.005,
+      density: 0.001,
+      isSensor: true,
+    })
+
+    physics.setVelocity(id, { x: 0, y: 0.8 })
+
+    whirlpool.setPhysicsBody(body)
+
+    // Add to engine
+    this.engine.addEntity(whirlpool)
+
+    // Create sprite
+    this.renderer.createEntitySprite(whirlpool, 'entities')
+  }
+
+  /**
+   * Handle collision events
+   */
+  private handleCollision(entityAId: string, entityBId: string): void {
+    const entityA = this.engine.getEntity(entityAId)
+    const entityB = this.engine.getEntity(entityBId)
+
+    if (!entityA || !entityB || !this.player) return
+
+    // Check if player collected something
+    if (
+      (entityA === this.player && entityB instanceof Collectible) ||
+      (entityB === this.player && entityA instanceof Collectible)
+    ) {
+      const collectible = (entityA instanceof Collectible
+        ? entityA
+        : entityB) as Collectible
+
+      if (!collectible.isCollected()) {
+        this.handleCollectiblePickup(collectible)
+      }
+    }
+  }
+
+  /**
+   * Handle collectible pickup
+   */
+  private handleCollectiblePickup(collectible: Collectible): void {
+    if (!this.player) return
+
+    const type = collectible.getCollectibleType()
+    const value = collectible.getValue()
+
+    switch (type) {
+      case CollectibleType.FISH:
+        this.score += value
+        break
+
+      case CollectibleType.HEALTH_PACK:
+        this.player.heal(value)
+        break
+
+      case CollectibleType.SPEED_BOOST:
+        this.player.applySpeedBoost(value * 1000)
+        break
+
+      case CollectibleType.SPECIMEN:
+        this.score += value
+        break
+    }
+
+    console.log(`[Game] Collected ${type}, value: ${value}`)
   }
 
   /**
@@ -161,6 +312,11 @@ export class Game {
    */
   private onTick(deltaTime: number): void {
     if (!this.renderer || !this.player) return
+
+    this.gameTime += deltaTime
+
+    // Increase difficulty over time
+    this.difficultyMultiplier = 1 + Math.floor(this.gameTime / 30000) * 0.2
 
     // Update player steering based on physics
     if (this.player.isAlive()) {
@@ -178,36 +334,100 @@ export class Game {
         const currentAngle = physics.getAngle('player') || 0
         physics.setAngle('player', currentAngle + turnAmount)
       }
+
+      // Apply whirlpool pull forces
+      const entities = this.engine.getAllEntities()
+      entities.forEach((entity) => {
+        if (entity instanceof Whirlpool) {
+          const pullForce = entity.getPullForce(this.player!.getPosition())
+          if (pullForce) {
+            physics.applyForce('player', pullForce)
+
+            // Deal damage if close enough and timer ready
+            if (entity.shouldDealDamage()) {
+              this.player!.takeDamage(entity.getDamageAmount())
+            }
+          }
+        }
+      })
     }
 
     // Update all entity sprites
     const entities = this.engine.getAllEntities()
     entities.forEach((entity) => {
       this.renderer!.updateEntitySprite(entity)
+
+      // Add invincibility visual effect
+      if (entity === this.player && this.player.isInvincible()) {
+        const sprite = (this.renderer! as any).sprites.get(entity.id)
+        if (sprite) {
+          sprite.alpha = 0.5 + Math.sin(this.gameTime / 100) * 0.3
+        }
+      }
     })
 
     // Update score display
+    const stats = this.player.getStats()
     this.renderer.updateText('score', `Score: ${this.score}`)
+    this.renderer.updateText('health', `Health: ${stats.health}`)
+    this.renderer.updateText('lives', `Lives: ${stats.lives}`)
+    this.renderer.updateText('distance', `Distance: ${stats.distance}m`)
     this.renderer.updateText(
-      'health',
-      `Health: ${this.player.getHealth()}`
+      'combo',
+      stats.combo > 0 ? `Combo: x${stats.combo}` : ''
+    )
+    this.renderer.updateText(
+      'speed',
+      `Speed: ${stats.speed.toFixed(1)} m/s`
     )
 
-    // Remove off-screen obstacles
+    // Remove off-screen entities and award points
     const { height } = this.renderer.getDimensions()
     entities.forEach((entity) => {
       if (entity instanceof Obstacle && entity.isOffScreen(height)) {
         this.renderer!.removeEntitySprite(entity.id)
         this.engine.removeEntity(entity.id)
-        this.score += 10 // Score for avoiding obstacle
+
+        // Award points and increment combo
+        const comboMultiplier = 1 + this.player!.getCombo() * 0.1
+        this.score += Math.floor(10 * comboMultiplier)
+        this.player!.incrementObstaclesAvoided()
+      }
+
+      if (entity instanceof Collectible && entity.isOffScreen(height)) {
+        this.renderer!.removeEntitySprite(entity.id)
+        this.engine.removeEntity(entity.id)
+      }
+
+      if (entity instanceof Whirlpool && entity.isOffScreen(height)) {
+        this.renderer!.removeEntitySprite(entity.id)
+        this.engine.removeEntity(entity.id)
       }
     })
 
-    // Spawn new obstacles
+    // Spawn new entities
     this.obstacleSpawnTimer += deltaTime
     if (this.obstacleSpawnTimer >= this.obstacleSpawnInterval) {
       this.spawnObstacle()
       this.obstacleSpawnTimer = 0
+
+      // Increase spawn rate with difficulty
+      this.obstacleSpawnInterval = Math.max(
+        800,
+        2000 - Math.floor(this.gameTime / 10000) * 100
+      )
+    }
+
+    this.collectibleSpawnTimer += deltaTime
+    if (this.collectibleSpawnTimer >= this.collectibleSpawnInterval) {
+      this.spawnCollectible()
+      this.collectibleSpawnTimer = 0
+    }
+
+    this.whirlpoolSpawnTimer += deltaTime
+    if (this.whirlpoolSpawnTimer >= this.whirlpoolSpawnInterval) {
+      this.spawnWhirlpool()
+      this.whirlpoolSpawnTimer = 0
     }
 
     // Check if player is dead
@@ -220,7 +440,6 @@ export class Game {
    * Set up input handlers
    */
   private setupInputHandlers(): void {
-    // Keyboard controls
     const keysPressed = new Set<string>()
 
     this.inputRouter.registerHandler('keydown', (event) => {
@@ -229,26 +448,7 @@ export class Game {
 
       if (!this.player) return null
 
-      // Update player controls based on keys pressed
-      let thrust = 0
-      let turn = 0
-
-      if (keysPressed.has('w') || keysPressed.has('arrowup')) {
-        thrust = 1
-      }
-      if (keysPressed.has('s') || keysPressed.has('arrowdown')) {
-        thrust = -0.5
-      }
-      if (keysPressed.has('a') || keysPressed.has('arrowleft')) {
-        turn = -1
-      }
-      if (keysPressed.has('d') || keysPressed.has('arrowright')) {
-        turn = 1
-      }
-
-      this.player.applyThrust(thrust)
-      this.player.applyTurn(turn)
-
+      this.updatePlayerControls(keysPressed)
       return null
     })
 
@@ -258,28 +458,35 @@ export class Game {
 
       if (!this.player) return null
 
-      // Recalculate controls
-      let thrust = 0
-      let turn = 0
-
-      if (keysPressed.has('w') || keysPressed.has('arrowup')) {
-        thrust = 1
-      }
-      if (keysPressed.has('s') || keysPressed.has('arrowdown')) {
-        thrust = -0.5
-      }
-      if (keysPressed.has('a') || keysPressed.has('arrowleft')) {
-        turn = -1
-      }
-      if (keysPressed.has('d') || keysPressed.has('arrowright')) {
-        turn = 1
-      }
-
-      this.player.applyThrust(thrust)
-      this.player.applyTurn(turn)
-
+      this.updatePlayerControls(keysPressed)
       return null
     })
+  }
+
+  /**
+   * Update player controls based on pressed keys
+   */
+  private updatePlayerControls(keysPressed: Set<string>): void {
+    if (!this.player) return
+
+    let thrust = 0
+    let turn = 0
+
+    if (keysPressed.has('w') || keysPressed.has('arrowup')) {
+      thrust = 1
+    }
+    if (keysPressed.has('s') || keysPressed.has('arrowdown')) {
+      thrust = -0.5
+    }
+    if (keysPressed.has('a') || keysPressed.has('arrowleft')) {
+      turn = -1
+    }
+    if (keysPressed.has('d') || keysPressed.has('arrowright')) {
+      turn = 1
+    }
+
+    this.player.applyThrust(thrust)
+    this.player.applyTurn(turn)
   }
 
   /**
@@ -289,15 +496,74 @@ export class Game {
     this.engine.pause()
     console.log(`[Game] Game Over! Final Score: ${this.score}`)
 
-    if (this.renderer) {
+    if (this.renderer && this.player) {
+      const stats = this.player.getStats()
+
+      // Show game over screen
+      this.renderer.clearLayer('ui')
       this.renderer.addText(
         'gameover',
         'GAME OVER',
-        this.renderer.getDimensions().width / 2 - 100,
-        this.renderer.getDimensions().height / 2,
+        this.renderer.getDimensions().width / 2 - 120,
+        150,
         {
           fontSize: 48,
           fill: 0xff0000,
+        }
+      )
+
+      this.renderer.addText(
+        'finalScore',
+        `Final Score: ${this.score}`,
+        this.renderer.getDimensions().width / 2 - 100,
+        220,
+        {
+          fontSize: 24,
+          fill: 0xffffff,
+        }
+      )
+
+      this.renderer.addText(
+        'statsDistance',
+        `Distance Traveled: ${stats.distance}m`,
+        this.renderer.getDimensions().width / 2 - 120,
+        260,
+        {
+          fontSize: 18,
+          fill: 0xcccccc,
+        }
+      )
+
+      this.renderer.addText(
+        'statsObstacles',
+        `Obstacles Avoided: ${stats.obstaclesAvoided}`,
+        this.renderer.getDimensions().width / 2 - 120,
+        290,
+        {
+          fontSize: 18,
+          fill: 0xcccccc,
+        }
+      )
+
+      this.renderer.addText(
+        'statsCombo',
+        `Max Combo: x${stats.maxCombo}`,
+        this.renderer.getDimensions().width / 2 - 120,
+        320,
+        {
+          fontSize: 18,
+          fill: 0xcccccc,
+        }
+      )
+
+      this.renderer.addText(
+        'statsCollectibles',
+        `Collectibles: ${stats.collectiblesGathered}`,
+        this.renderer.getDimensions().width / 2 - 120,
+        350,
+        {
+          fontSize: 18,
+          fill: 0xcccccc,
         }
       )
     }
@@ -335,10 +601,10 @@ export class Game {
   }
 
   /**
-   * Get player health
+   * Get player stats
    */
-  getPlayerHealth(): number {
-    return this.player ? this.player.getHealth() : 0
+  getPlayerStats() {
+    return this.player ? this.player.getStats() : null
   }
 
   /**
