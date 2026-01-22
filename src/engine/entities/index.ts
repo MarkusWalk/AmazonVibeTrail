@@ -1,0 +1,6 @@
+export { Entity } from './Entity'
+export { Player } from './Player'
+export { Obstacle, ObstacleSubType } from './Obstacle'
+export { Collectible, CollectibleType } from './Collectible'
+export { Whirlpool } from './Whirlpool'
+export { Fork } from './Fork'
