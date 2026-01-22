@@ -1,29 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
-import { GameEngine, StateManager } from '@engine/core'
+import { StateManager } from '@engine/core'
+import { Game } from '@engine/Game'
+import { PixiRenderer } from '@rendering/pixi'
 import { GameState } from '@models/index'
 import './App.css'
 
 function App() {
-  const [engineState, setEngineState] = useState<{
-    isRunning: boolean
-    isPaused: boolean
-    targetFPS: number
-  } | null>(null)
   const [gameState, setGameState] = useState<GameState>(GameState.BOOT)
-  const engineRef = useRef<GameEngine | null>(null)
+  const [stats, setStats] = useState({ score: 0, health: 100 })
+  const canvasContainerRef = useRef<HTMLDivElement>(null)
+  const gameRef = useRef<Game | null>(null)
+  const rendererRef = useRef<PixiRenderer | null>(null)
   const stateManagerRef = useRef<StateManager | null>(null)
 
   useEffect(() => {
-    // Initialize game engine
-    const engine = new GameEngine({
-      audio: { masterVolume: 0.8, sfxEnabled: true },
-      gameplay: { difficulty: 'EXPLORER', steeringSensitivity: 1.0 },
-      ui: { highContrast: false, tooltipDelay: 500 },
-    })
-
-    engine.initialize()
-    engineRef.current = engine
-
     // Initialize state manager
     const stateManager = new StateManager()
     stateManagerRef.current = stateManager
@@ -33,54 +23,104 @@ function App() {
       setGameState(newState)
     })
 
-    // Subscribe to engine ticks
-    engine.subscribe('tick', (_deltaTime) => {
-      // Update engine state display
-      setEngineState(engine.getState())
-    })
-
     // Transition to menu after boot
     setTimeout(() => {
       stateManager.setState(GameState.MENU)
     }, 1000)
 
     return () => {
-      engine.stop()
+      if (gameRef.current) {
+        gameRef.current.destroy()
+      }
+      if (rendererRef.current) {
+        rendererRef.current.destroy()
+      }
     }
   }, [])
 
-  const handleStartEngine = () => {
-    if (engineRef.current) {
-      engineRef.current.start()
-      setEngineState(engineRef.current.getState())
+  const handleStartGame = async () => {
+    if (!canvasContainerRef.current || !stateManagerRef.current) return
+
+    // Clear any existing game/renderer
+    if (gameRef.current) {
+      gameRef.current.destroy()
+    }
+    if (rendererRef.current) {
+      rendererRef.current.destroy()
+    }
+
+    // Create renderer
+    const renderer = new PixiRenderer({
+      width: 800,
+      height: 600,
+      backgroundColor: 0x4a90a4, // River blue
+      antialias: true,
+    })
+    await renderer.initialize(canvasContainerRef.current)
+    rendererRef.current = renderer
+
+    // Add UI text
+    renderer.addText('score', 'Score: 0', 10, 10, {
+      fontSize: 20,
+      fill: 0xffffff,
+    })
+    renderer.addText('health', 'Health: 100', 10, 40, {
+      fontSize: 20,
+      fill: 0xffffff,
+    })
+    renderer.addText('controls', 'Controls: WASD or Arrow Keys', 10, 70, {
+      fontSize: 16,
+      fill: 0xcccccc,
+    })
+
+    // Create game
+    const game = new Game({
+      audio: { masterVolume: 0.8, sfxEnabled: true },
+      gameplay: { difficulty: 'EXPLORER', steeringSensitivity: 1.0 },
+      ui: { highContrast: false, tooltipDelay: 500 },
+    })
+    game.setRenderer(renderer)
+    gameRef.current = game
+
+    // Start game
+    await game.start()
+
+    // Update UI stats periodically
+    const statsInterval = setInterval(() => {
+      if (gameRef.current) {
+        setStats({
+          score: gameRef.current.getScore(),
+          health: gameRef.current.getPlayerHealth(),
+        })
+      }
+    }, 100)
+
+    // Transition to river state
+    stateManagerRef.current.setState(GameState.RIVER)
+
+    return () => {
+      clearInterval(statsInterval)
     }
   }
 
-  const handleStopEngine = () => {
-    if (engineRef.current) {
-      engineRef.current.stop()
-      setEngineState(engineRef.current.getState())
+  const handlePauseGame = () => {
+    if (gameRef.current) {
+      gameRef.current.pause()
     }
   }
 
-  const handlePauseEngine = () => {
-    if (engineRef.current) {
-      engineRef.current.pause()
-      setEngineState(engineRef.current.getState())
+  const handleResumeGame = () => {
+    if (gameRef.current) {
+      gameRef.current.resume()
     }
   }
 
-  const handleResumeEngine = () => {
-    if (engineRef.current) {
-      engineRef.current.resume()
-      setEngineState(engineRef.current.getState())
+  const handleStopGame = () => {
+    if (gameRef.current) {
+      gameRef.current.stop()
     }
-  }
-
-  const handleStartGame = () => {
     if (stateManagerRef.current) {
-      stateManagerRef.current.setState(GameState.RIVER)
-      handleStartEngine()
+      stateManagerRef.current.setState(GameState.MENU)
     }
   }
 
@@ -89,27 +129,11 @@ function App() {
       <div className="app-header">
         <h1>🌴 Amazon Vibe Trail 🌴</h1>
         <p className="subtitle">
-          A modern recreation of the classic educational game
+          Navigate the Amazon River - Avoid obstacles, survive!
         </p>
       </div>
 
       <div className="app-content">
-        <div className="state-display">
-          <h2>Game State: {gameState}</h2>
-          {engineState && (
-            <div className="engine-info">
-              <p>
-                Engine Status:{' '}
-                {engineState.isRunning ? '🟢 Running' : '🔴 Stopped'}
-              </p>
-              <p>
-                Simulation: {engineState.isPaused ? '⏸️ Paused' : '▶️ Active'}
-              </p>
-              <p>Target FPS: {engineState.targetFPS}</p>
-            </div>
-          )}
-        </div>
-
         {gameState === GameState.BOOT && (
           <div className="boot-screen">
             <div className="loading-spinner"></div>
@@ -119,6 +143,15 @@ function App() {
 
         {gameState === GameState.MENU && (
           <div className="menu-screen">
+            <div className="game-info">
+              <h2>How to Play</h2>
+              <ul>
+                <li>🛶 Use WASD or Arrow Keys to steer your canoe</li>
+                <li>🪵 Avoid obstacles floating down the river</li>
+                <li>❤️ Keep your health above zero</li>
+                <li>⭐ Score points for each obstacle you avoid</li>
+              </ul>
+            </div>
             <div className="menu-buttons">
               <button className="menu-button primary" onClick={handleStartGame}>
                 Start New Journey
@@ -138,40 +171,43 @@ function App() {
 
         {gameState === GameState.RIVER && (
           <div className="river-screen">
-            <div className="game-canvas">
-              <p className="canvas-placeholder">
-                🛶 River View - Canvas will render here
-              </p>
-              <p className="dev-note">
-                PixiJS canvas integration coming in next phase
-              </p>
+            <div className="game-stats">
+              <div className="stat">
+                <span className="stat-label">Score:</span>
+                <span className="stat-value">{stats.score}</span>
+              </div>
+              <div className="stat">
+                <span className="stat-label">Health:</span>
+                <span
+                  className="stat-value"
+                  style={{
+                    color:
+                      stats.health > 60
+                        ? '#90ee90'
+                        : stats.health > 30
+                          ? '#ffff00'
+                          : '#ff0000',
+                  }}
+                >
+                  {stats.health}
+                </span>
+              </div>
             </div>
 
-            <div className="engine-controls">
-              <h3>Engine Controls (Debug)</h3>
-              <div className="control-buttons">
-                {engineState?.isPaused ? (
-                  <button onClick={handleResumeEngine}>Resume</button>
-                ) : (
-                  <button onClick={handlePauseEngine}>Pause</button>
-                )}
-                <button onClick={handleStopEngine}>Stop Engine</button>
-                <button
-                  onClick={() =>
-                    stateManagerRef.current?.setState(GameState.MENU)
-                  }
-                >
-                  Back to Menu
-                </button>
-              </div>
+            <div className="game-canvas" ref={canvasContainerRef}></div>
+
+            <div className="game-controls">
+              <button onClick={handlePauseGame}>⏸️ Pause</button>
+              <button onClick={handleResumeGame}>▶️ Resume</button>
+              <button onClick={handleStopGame}>⏹️ Stop</button>
             </div>
           </div>
         )}
       </div>
 
       <div className="app-footer">
-        <p>Phase 0: Project Setup Complete ✅</p>
-        <p>Next: Implement PixiJS rendering and physics</p>
+        <p>Phase 1: Core Game Loop Complete ✅</p>
+        <p>Physics, Rendering, and Controls Working!</p>
       </div>
     </div>
   )
