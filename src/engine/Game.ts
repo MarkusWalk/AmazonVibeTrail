@@ -9,9 +9,12 @@ import {
   Fork,
 } from './entities'
 import { NavigationManager } from './navigation'
+import { EventManager, QuestManager, SpecimenManager } from './systems'
+import type { GameContext } from './systems/EventManager'
 import { amazonRiverMap } from '@data/maps/amazonRiver'
+import { sampleGameContent } from '@data/events/sampleEvents'
 import type { PixiRenderer } from '@rendering/pixi'
-import type { GameConfig } from '@models/index'
+import type { GameConfig, GameEvent } from '@models/index'
 
 /**
  * Game - Main game coordinator
@@ -23,6 +26,11 @@ export class Game {
   private inputRouter: InputRouter
   private player: Player | null = null
   private navigationManager: NavigationManager
+
+  // Phase 5 Content Systems
+  private eventManager: EventManager
+  private questManager: QuestManager
+  private specimenManager: SpecimenManager
 
   // Game state
   private score: number = 0
@@ -48,7 +56,12 @@ export class Game {
     // Initialize navigation with Amazon River map
     this.navigationManager = new NavigationManager(amazonRiverMap, 'belem')
 
-    console.log('[Game] Initialized with navigation system')
+    // Initialize Phase 5 content systems
+    this.eventManager = new EventManager()
+    this.questManager = new QuestManager()
+    this.specimenManager = new SpecimenManager()
+
+    console.log('[Game] Initialized with navigation and content systems')
   }
 
   /**
@@ -70,6 +83,14 @@ export class Game {
 
     // Create player
     this.createPlayer()
+
+    // Register sample content
+    this.eventManager.registerEvents(sampleGameContent.events)
+    sampleGameContent.quests.forEach((quest) =>
+      this.questManager.registerQuest(quest)
+    )
+    this.specimenManager.registerSpecimens(sampleGameContent.specimens)
+    console.log('[Game] Registered sample content')
 
     // Create initial obstacles
     this.spawnObstacle()
@@ -348,10 +369,126 @@ export class Game {
 
       case CollectibleType.SPECIMEN:
         this.score += value
+        // Handle specimen discovery
+        // For now, trigger a random specimen discovery
+        const allSpecimens = Array.from(
+          sampleGameContent.specimens.map((s) => s.id)
+        )
+        const randomSpecimen =
+          allSpecimens[Math.floor(Math.random() * allSpecimens.length)]
+        const currentNode = this.navigationManager.getCurrentNode()
+        const specimen = this.specimenManager.discoverSpecimen(
+          randomSpecimen,
+          currentNode?.name
+        )
+        if (specimen) {
+          console.log(`[Game] Discovered specimen: ${specimen.name}`)
+
+          // Check for collection quests
+          const activeQuests = this.questManager.getActiveQuests()
+          activeQuests.forEach((quest) => {
+            quest.objectives.forEach((objective) => {
+              if (
+                objective.type === 'collect' &&
+                objective.target === specimen.id
+              ) {
+                this.questManager.incrementObjective(quest.id, objective.id, 1)
+                console.log(
+                  `[Game] Quest progress: ${objective.description} (${objective.current}/${objective.required})`
+                )
+              }
+            })
+          })
+        }
         break
     }
 
     console.log(`[Game] Collected ${type}, value: ${value}`)
+  }
+
+  /**
+   * Handle triggered events from EventManager
+   */
+  private handleTriggeredEvents(events: GameEvent[]): void {
+    const player = this.player
+    if (!player) return
+
+    events.forEach((event) => {
+      // Trigger the event
+      this.eventManager.triggerEvent(event.id)
+
+      // Handle different event types
+      switch (event.type) {
+        case 'DIALOGUE':
+          console.log(`[Game] Dialogue event: ${event.name}`)
+          // TODO: Open dialogue UI with event.data.dialogueId
+          // For now, just log and complete
+          this.eventManager.completeEvent(event.id)
+          break
+
+        case 'DISCOVERY':
+          console.log(`[Game] Discovery event: ${event.name}`)
+          if (event.data.discoveryType === 'specimen' && event.data.discoveryId) {
+            const currentNode = this.navigationManager.getCurrentNode()
+            const specimen = this.specimenManager.discoverSpecimen(
+              event.data.discoveryId as string,
+              currentNode?.name
+            )
+            if (specimen) {
+              console.log(
+                `[Game] Discovered specimen: ${specimen.name} (${specimen.category})`
+              )
+            }
+          }
+          this.eventManager.completeEvent(event.id)
+          break
+
+        case 'QUEST':
+          console.log(`[Game] Quest event: ${event.name}`)
+          if (event.data.questId) {
+            const started = this.questManager.startQuest(
+              event.data.questId as string
+            )
+            if (started) {
+              console.log(`[Game] Started quest: ${event.data.questId}`)
+            }
+          }
+          this.eventManager.completeEvent(event.id)
+          break
+
+        case 'HAZARD':
+          console.log(`[Game] Hazard event: ${event.name}`)
+          if (event.data.damage) {
+            player.takeDamage(event.data.damage as number)
+            console.log(`[Game] Hazard dealt ${event.data.damage} damage`)
+          }
+          this.eventManager.completeEvent(event.id)
+          break
+
+        case 'TRADE':
+          console.log(`[Game] Trade event: ${event.name}`)
+          // TODO: Open trade UI with event.data.merchantId
+          // For now, just log and complete
+          this.eventManager.completeEvent(event.id)
+          break
+
+        case 'ENCOUNTER':
+          console.log(`[Game] Encounter event: ${event.name}`)
+          // TODO: Handle encounter
+          this.eventManager.completeEvent(event.id)
+          break
+
+        case 'ENVIRONMENTAL':
+          console.log(`[Game] Environmental event: ${event.name}`)
+          // TODO: Apply environmental effect
+          this.eventManager.completeEvent(event.id)
+          break
+
+        default:
+          console.warn(`[Game] Unhandled event type: ${event.type}`)
+          this.eventManager.completeEvent(event.id)
+      }
+    })
   }
 
   /**
@@ -430,6 +567,24 @@ export class Game {
         this.renderer.removeEntitySprite(this.currentFork.id)
         this.engine.removeEntity(this.currentFork.id)
         this.currentFork = null
+      }
+
+      // Check for triggered events (Phase 5 integration)
+      const stats = this.player.getStats()
+      const currentNode = this.navigationManager.getCurrentNode()
+
+      const gameContext: GameContext = {
+        currentLocation: currentNode?.id,
+        gameTime: this.gameTime,
+        distanceTraveled: stats.distance,
+        health: stats.health,
+        rations: 100, // TODO: Add rations system
+        inventory: new Map(), // TODO: Build from player inventory
+      }
+
+      const triggeredEvents = this.eventManager.checkTriggers(gameContext)
+      if (triggeredEvents.length > 0) {
+        this.handleTriggeredEvents(triggeredEvents)
       }
     }
 
