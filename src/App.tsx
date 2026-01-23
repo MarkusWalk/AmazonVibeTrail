@@ -3,6 +3,8 @@ import { StateManager } from '@engine/core'
 import { Game } from '@engine/Game'
 import { PixiRenderer } from '@rendering/pixi'
 import { GameState } from '@models/index'
+import { Dashboard } from './ui/components/Dashboard'
+import type { QuickSlotItem, StatusEffect } from './ui/components/Dashboard'
 import './App.css'
 
 function App() {
@@ -15,6 +17,17 @@ function App() {
     combo: 0,
     speed: 0,
   })
+  const [rations, setRations] = useState(100)
+  const [direction, setDirection] = useState(180) // Facing south (downstream)
+  const [quickSlots] = useState<(QuickSlotItem | null)[]>([
+    { id: 'harpoon', name: 'Harpoon', icon: '🔱', count: 5 },
+    { id: 'health', name: 'Health Potion', icon: '🧪', count: 3 },
+    { id: 'map', name: 'Map', icon: '🗺️' },
+    null,
+    null,
+  ])
+  const [selectedSlot, setSelectedSlot] = useState(0)
+  const [statuses, setStatuses] = useState<StatusEffect[]>([])
   const canvasContainerRef = useRef<HTMLDivElement>(null)
   const gameRef = useRef<Game | null>(null)
   const rendererRef = useRef<PixiRenderer | null>(null)
@@ -125,6 +138,35 @@ function App() {
             combo: playerStats.combo,
             speed: playerStats.speed,
           })
+
+          // Update direction (convert radians to degrees if needed)
+          const angle = playerStats.angle || 0
+          setDirection((angle * 180 / Math.PI) + 180) // Convert to compass degrees
+
+          // Decrease rations over time (simulate consumption)
+          setRations(prev => Math.max(0, prev - 0.05))
+
+          // Update status effects based on player state
+          const newStatuses: StatusEffect[] = []
+          if (playerStats.speedBoostActive) {
+            newStatuses.push({
+              id: 'speed_boost',
+              name: 'Speed Boost',
+              icon: '⚡',
+              duration: playerStats.speedBoostRemaining / 1000,
+              type: 'buff'
+            })
+          }
+          if (playerStats.invincible) {
+            newStatuses.push({
+              id: 'invincible',
+              name: 'Invincible',
+              icon: '🛡️',
+              duration: playerStats.invincibilityRemaining / 1000,
+              type: 'buff'
+            })
+          }
+          setStatuses(newStatuses)
         }
       }
     }, 100)
@@ -208,46 +250,20 @@ function App() {
 
         {gameState === GameState.RIVER && (
           <div className="river-screen">
-            <div className="game-stats">
-              <div className="stat">
-                <span className="stat-label">Score</span>
-                <span className="stat-value">{stats.score}</span>
-              </div>
-              <div className="stat">
-                <span className="stat-label">Lives</span>
-                <span className="stat-value">{'❤️'.repeat(stats.lives)}</span>
-              </div>
-              <div className="stat">
-                <span className="stat-label">Health</span>
-                <span
-                  className="stat-value"
-                  style={{
-                    color:
-                      stats.health > 60
-                        ? '#90ee90'
-                        : stats.health > 30
-                          ? '#ffff00'
-                          : '#ff0000',
-                  }}
-                >
-                  {stats.health}
-                </span>
-              </div>
-              <div className="stat">
-                <span className="stat-label">Distance</span>
-                <span className="stat-value">{stats.distance}m</span>
-              </div>
-              {stats.combo > 0 && (
-                <div className="stat combo">
-                  <span className="stat-label">Combo</span>
-                  <span className="stat-value" style={{ color: '#ffff00' }}>
-                    x{stats.combo}
-                  </span>
-                </div>
-              )}
-            </div>
-
             <div className="game-canvas" ref={canvasContainerRef}></div>
+
+            <Dashboard
+              health={stats.health}
+              maxHealth={100}
+              rations={rations}
+              maxRations={100}
+              direction={direction}
+              location={`Score: ${stats.score} | Distance: ${stats.distance}m`}
+              quickSlots={quickSlots}
+              selectedSlot={selectedSlot}
+              statuses={statuses}
+              onSlotClick={(index) => setSelectedSlot(index)}
+            />
 
             <div className="game-controls">
               <button onClick={handlePauseGame}>⏸️ Pause</button>

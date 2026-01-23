@@ -330,6 +330,11 @@ export class Player extends Entity {
     obstaclesAvoided: number
     collectiblesGathered: number
     speed: number
+    angle: number
+    speedBoostActive: boolean
+    speedBoostRemaining: number
+    invincible: boolean
+    invincibilityRemaining: number
   } {
     return {
       health: this.health,
@@ -340,6 +345,11 @@ export class Player extends Entity {
       obstaclesAvoided: this.obstaclesAvoided,
       collectiblesGathered: this.collectiblesGathered,
       speed: this.getCurrentSpeed(),
+      angle: this.angle,
+      speedBoostActive: this.speedBoostTimer > 0,
+      speedBoostRemaining: this.speedBoostTimer,
+      invincible: this.invincibilityTimer > 0,
+      invincibilityRemaining: this.invincibilityTimer,
     }
   }
 }
