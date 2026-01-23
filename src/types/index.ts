@@ -91,3 +91,6 @@ export * from './navigation'
 
 // Export sprite types
 export * from './sprites'
+
+// Export dialogue types
+export * from './dialogue'

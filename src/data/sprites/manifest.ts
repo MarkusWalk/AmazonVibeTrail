@@ -1,4 +1,5 @@
 import { SpriteCategory, SpriteManifest } from '@models/sprites'
+import * as Placeholders from './placeholders'
 
 /**
  * Sprite Manifest
@@ -7,12 +8,12 @@ import { SpriteCategory, SpriteManifest } from '@models/sprites'
  * Sprites can be:
  * 1. External files: src = '/sprites/category/name.png'
  * 2. AI-generated base64: src = 'data:image/png;base64,...'
- * 3. Placeholders: Using data URLs with simple shapes
+ * 3. Placeholders: Using data URLs with simple shapes (see placeholders.ts)
  *
  * To add AI-generated sprites:
  * 1. Generate sprite with nano-banana or other AI tool
  * 2. Convert to base64 data URL
- * 3. Add entry here with metadata
+ * 3. Replace the placeholder src below with your generated sprite
  */
 
 export const spriteManifest: SpriteManifest = {
@@ -25,33 +26,39 @@ export const spriteManifest: SpriteManifest = {
       category: SpriteCategory.NPC,
       name: 'Elderly Guide',
       description: 'Wise elderly guide with knowledge of the river',
-      src: '/sprites/npc/guide_elderly.png', // Placeholder - to be generated
+      src: Placeholders.PLACEHOLDER_GUIDE,
       width: 64,
       height: 64,
       tags: ['human', 'guide', 'wise'],
       rarity: 'common',
+      generatedBy: 'placeholder',
+      prompt: 'Replace with: elderly Amazon river guide, pixel art, 64x64',
     },
     {
       id: 'npc_trader_merchant',
       category: SpriteCategory.NPC,
       name: 'River Merchant',
       description: 'Traveling merchant trading goods along the river',
-      src: '/sprites/npc/trader_merchant.png', // Placeholder - to be generated
+      src: Placeholders.PLACEHOLDER_MERCHANT,
       width: 64,
       height: 64,
       tags: ['human', 'trader', 'merchant'],
       rarity: 'common',
+      generatedBy: 'placeholder',
+      prompt: 'Replace with: river trader merchant, pixel art, 64x64',
     },
     {
       id: 'npc_shaman',
       category: SpriteCategory.NPC,
       name: 'Tribal Shaman',
       description: 'Spiritual leader with healing knowledge',
-      src: '/sprites/npc/shaman.png', // Placeholder - to be generated
+      src: Placeholders.PLACEHOLDER_SHAMAN,
       width: 64,
       height: 64,
       tags: ['human', 'healer', 'spiritual'],
       rarity: 'uncommon',
+      generatedBy: 'placeholder',
+      prompt: 'Replace with: tribal shaman with mystical appearance, pixel art, 64x64',
     },
 
     // ===== Items =====
@@ -60,36 +67,42 @@ export const spriteManifest: SpriteManifest = {
       category: SpriteCategory.ITEM,
       name: 'Harpoon',
       description: 'Fishing tool for catching large fish',
-      src: '/sprites/items/harpoon.png', // Placeholder - to be generated
+      src: Placeholders.PLACEHOLDER_HARPOON,
       width: 32,
       height: 32,
       tags: ['tool', 'fishing', 'weapon'],
       rarity: 'common',
       value: 25,
+      generatedBy: 'placeholder',
+      prompt: 'Replace with: fishing harpoon icon, pixel art, 32x32',
     },
     {
       id: 'item_medicine',
       category: SpriteCategory.ITEM,
       name: 'Medicine',
       description: 'Herbal medicine for healing wounds',
-      src: '/sprites/items/medicine.png', // Placeholder - to be generated
+      src: Placeholders.PLACEHOLDER_MEDICINE,
       width: 32,
       height: 32,
       tags: ['consumable', 'healing'],
       rarity: 'common',
       value: 30,
+      generatedBy: 'placeholder',
+      prompt: 'Replace with: medicine bottle with red cross, pixel art, 32x32',
     },
     {
       id: 'item_compass',
       category: SpriteCategory.ITEM,
       name: 'Brass Compass',
       description: 'Navigational tool for finding your way',
-      src: '/sprites/items/compass.png', // Placeholder - to be generated
+      src: Placeholders.PLACEHOLDER_COMPASS,
       width: 32,
       height: 32,
       tags: ['tool', 'navigation'],
       rarity: 'uncommon',
       value: 50,
+      generatedBy: 'placeholder',
+      prompt: 'Replace with: brass compass icon, pixel art, 32x32',
     },
     {
       id: 'item_map',
@@ -122,11 +135,13 @@ export const spriteManifest: SpriteManifest = {
       category: SpriteCategory.CREATURE,
       name: 'Piranha',
       description: 'Dangerous carnivorous fish',
-      src: '/sprites/creatures/piranha.png', // Placeholder - to be generated
+      src: Placeholders.PLACEHOLDER_PIRANHA,
       width: 48,
       height: 48,
       tags: ['fish', 'dangerous', 'hostile'],
       rarity: 'common',
+      generatedBy: 'placeholder',
+      prompt: 'Replace with: dangerous piranha fish with sharp teeth, pixel art, 48x48',
     },
     {
       id: 'creature_anaconda',
@@ -155,11 +170,13 @@ export const spriteManifest: SpriteManifest = {
       category: SpriteCategory.CREATURE,
       name: 'Macaw',
       description: 'Colorful tropical parrot',
-      src: '/sprites/creatures/macaw.png', // Placeholder - to be generated
+      src: Placeholders.PLACEHOLDER_MACAW,
       width: 48,
       height: 48,
       tags: ['bird', 'peaceful', 'collectible'],
       rarity: 'common',
+      generatedBy: 'placeholder',
+      prompt: 'Replace with: colorful macaw parrot, bright colors, pixel art, 48x48',
     },
     {
       id: 'creature_dolphin_pink',
@@ -223,10 +240,12 @@ export const spriteManifest: SpriteManifest = {
       category: SpriteCategory.ENVIRONMENT,
       name: 'Palm Tree',
       description: 'Tropical palm tree',
-      src: '/sprites/environment/tree_palm.png', // Placeholder - to be generated
+      src: Placeholders.PLACEHOLDER_PALM_TREE,
       width: 64,
       height: 96,
       tags: ['tree', 'background'],
+      generatedBy: 'placeholder',
+      prompt: 'Replace with: tropical palm tree, pixel art, 64x96',
     },
     {
       id: 'env_rock_river',
