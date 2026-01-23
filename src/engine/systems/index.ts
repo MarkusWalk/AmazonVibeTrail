@@ -1,2 +1,5 @@
 export { PhysicsSystem } from './PhysicsSystem'
 export { EntityManager } from './EntityManager'
+export { EventManager } from './EventManager'
+export { QuestManager } from './QuestManager'
+export { SpecimenManager } from './SpecimenManager'

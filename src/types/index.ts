@@ -94,3 +94,6 @@ export * from './sprites'
 
 // Export dialogue types
 export * from './dialogue'
+
+// Export event types
+export * from './events'
