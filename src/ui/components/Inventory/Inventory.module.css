@@ -1,0 +1,354 @@
+.inventoryLayout {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: 500px;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.categoryFilters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.categoryFilters button {
+  padding: 8px 16px;
+  background: linear-gradient(to bottom, #4b5563, #374151);
+  border: 2px solid #1f2937;
+  border-radius: 6px;
+  color: #e5e7eb;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.categoryFilters button:hover {
+  background: linear-gradient(to bottom, #6b7280, #4b5563);
+  transform: translateY(-1px);
+}
+
+.categoryFilters button.active {
+  background: linear-gradient(to bottom, #d4af37, #aa8a2e);
+  border-color: #8b6914;
+  color: #1a0f0a;
+}
+
+.sortControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sortControls label {
+  font-size: 14px;
+  color: #9ca3af;
+  font-weight: 600;
+}
+
+.sortControls select {
+  padding: 6px 12px;
+  background: #1f2937;
+  border: 2px solid #374151;
+  border-radius: 4px;
+  color: #e5e7eb;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.weightDisplay {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.weightLabel {
+  font-size: 13px;
+  color: #9ca3af;
+  font-weight: 600;
+}
+
+.weightBar {
+  width: 100%;
+  height: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(139, 69, 19, 0.4);
+}
+
+.weightFill {
+  height: 100%;
+  transition: width 0.3s ease, background-color 0.3s ease;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.itemGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  min-height: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.emptyState {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.itemCard {
+  position: relative;
+  background: linear-gradient(to bottom, #2d1810, #1a0f0a);
+  border: 2px solid #8b6914;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 120px;
+}
+
+.itemCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+  border-color: #d4af37;
+}
+
+.itemCard.selected {
+  border-color: #d4af37;
+  box-shadow: 0 0 16px rgba(212, 175, 55, 0.5);
+  background: linear-gradient(to bottom, #3d2820, #2a1810);
+}
+
+/* Rarity colors */
+.itemCard.uncommon {
+  border-color: #10b981;
+}
+
+.itemCard.rare {
+  border-color: #3b82f6;
+}
+
+.itemCard.legendary {
+  border-color: #a855f7;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);
+}
+
+.itemIcon {
+  font-size: 40px;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.8));
+}
+
+.itemName {
+  font-size: 12px;
+  font-weight: 600;
+  color: #e5e7eb;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.itemQuantity {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 4px;
+  min-width: 24px;
+  text-align: center;
+}
+
+.rarityBadge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: 9px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.rarityBadge.uncommon {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.rarityBadge.rare {
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+.rarityBadge.legendary {
+  background: #a855f7;
+  color: #ffffff;
+}
+
+.detailsPanel {
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid #8b6914;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.detailsHeader {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(139, 105, 20, 0.3);
+}
+
+.detailsIcon {
+  font-size: 48px;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.8));
+}
+
+.detailsHeader h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #d4af37;
+  font-family: 'Georgia', serif;
+}
+
+.detailsCategory {
+  margin: 4px 0 0 0;
+  font-size: 13px;
+  color: #9ca3af;
+  text-transform: capitalize;
+  font-style: italic;
+}
+
+.detailsDescription {
+  color: #e5e7eb;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.detailsStats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+}
+
+.stat {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #e5e7eb;
+}
+
+.stat span:first-child {
+  color: #9ca3af;
+  font-weight: 600;
+}
+
+.detailsActions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.useButton,
+.dropButton {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid;
+  min-width: 100px;
+}
+
+.useButton {
+  background: linear-gradient(to bottom, #10b981, #059669);
+  border-color: #047857;
+  color: #ffffff;
+}
+
+.useButton:hover {
+  background: linear-gradient(to bottom, #34d399, #10b981);
+  transform: translateY(-2px);
+}
+
+.dropButton {
+  background: linear-gradient(to bottom, #6b7280, #4b5563);
+  border-color: #374151;
+  color: #e5e7eb;
+}
+
+.dropButton:hover {
+  background: linear-gradient(to bottom, #9ca3af, #6b7280);
+  transform: translateY(-2px);
+}
+
+/* Custom scrollbar */
+.itemGrid::-webkit-scrollbar {
+  width: 8px;
+}
+
+.itemGrid::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.itemGrid::-webkit-scrollbar-thumb {
+  background: rgba(139, 105, 20, 0.5);
+  border-radius: 4px;
+}
+
+.itemGrid::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 105, 20, 0.7);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .itemGrid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 8px;
+  }
+
+  .categoryFilters {
+    justify-content: center;
+  }
+
+  .detailsActions {
+    flex-direction: column;
+  }
+
+  .useButton,
+  .dropButton {
+    width: 100%;
+  }
+}
