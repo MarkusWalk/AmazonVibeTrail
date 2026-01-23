@@ -88,3 +88,6 @@ export type Command = {
 
 // Export navigation types
 export * from './navigation'
+
+// Export sprite types
+export * from './sprites'
