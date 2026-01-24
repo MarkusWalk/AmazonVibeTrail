@@ -5,6 +5,9 @@ import { PixiRenderer } from '@rendering/pixi'
 import { GameState } from '@models/index'
 import { Dashboard } from './ui/components/Dashboard'
 import { Dialogue } from './ui/components/Dialogue'
+import { Inventory } from './ui/components/Inventory'
+import { InteractiveMap } from './ui/components/Map'
+import { convertInventoryToItems } from '@data/items/itemDefinitions'
 import { UIEventManager, type UIOverlayType, type UIEventData } from './ui/UIEventManager'
 import type { QuickSlotItem, StatusEffect } from './ui/components/Dashboard'
 import './App.css'
@@ -18,7 +21,10 @@ function App() {
     distance: 0,
     combo: 0,
     speed: 0,
+    currentWeight: 0,
+    maxWeight: 100,
   })
+  const [playerInventory, setPlayerInventory] = useState<Map<string, number>>(new Map())
   const [rations, setRations] = useState(100)
   const [maxRations, setMaxRations] = useState(100)
   const [direction, setDirection] = useState(180) // Facing south (downstream)
@@ -149,6 +155,8 @@ function App() {
             distance: playerStats.distance,
             combo: playerStats.combo,
             speed: playerStats.speed,
+            currentWeight: playerStats.currentWeight,
+            maxWeight: playerStats.maxWeight,
           })
 
           // Update direction (convert radians to degrees if needed)
@@ -158,6 +166,12 @@ function App() {
           // Update rations from player stats
           setRations(playerStats.rations)
           setMaxRations(playerStats.maxRations)
+
+          // Update inventory
+          const inventory = (gameRef.current as any).player?.getInventory()
+          if (inventory) {
+            setPlayerInventory(inventory)
+          }
 
           // Update status effects based on player state
           const newStatuses: StatusEffect[] = []
@@ -294,18 +308,16 @@ function App() {
               />
             )}
 
-            {currentOverlay === 'map' && (
+            {currentOverlay === 'map' && gameRef.current && (
               <div style={{
                 position: 'fixed',
                 top: 0,
                 left: 0,
                 right: 0,
                 bottom: 0,
-                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                backgroundColor: 'rgba(0, 0, 0, 0.9)',
                 zIndex: 1000,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
+                padding: '20px',
               }}>
                 <button
                   onClick={handleCloseOverlay}
@@ -315,45 +327,49 @@ function App() {
                     right: '20px',
                     padding: '10px 20px',
                     fontSize: '16px',
+                    zIndex: 1001,
+                    background: '#333',
+                    color: 'white',
+                    border: '2px solid #666',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
                   }}
                 >
-                  Close Map
+                  Close Map ✕
                 </button>
-                <div style={{ color: 'white', fontSize: '24px' }}>
-                  Interactive Map - Coming Soon
-                </div>
+                <InteractiveMap
+                  mapGraph={gameRef.current.getNavigationManager().getMapGraph()}
+                  currentNodeId={gameRef.current.getNavigationManager().getCurrentNode()?.id || 'belem'}
+                  visitedNodeIds={gameRef.current.getNavigationManager().getVisitedNodes()}
+                  onNodeSelect={(nodeId) => {
+                    console.log(`[App] Selected node: ${nodeId}`)
+                  }}
+                  onPlotCourse={(nodeId) => {
+                    console.log(`[App] Plot course to: ${nodeId}`)
+                    gameRef.current?.getNavigationManager().setTarget(nodeId)
+                    handleCloseOverlay()
+                  }}
+                />
               </div>
             )}
 
             {currentOverlay === 'inventory' && (
-              <div style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                zIndex: 1000,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-                <button
-                  onClick={handleCloseOverlay}
-                  style={{
-                    position: 'absolute',
-                    top: '20px',
-                    right: '20px',
-                    padding: '10px 20px',
-                    fontSize: '16px',
-                  }}
-                >
-                  Close Inventory
-                </button>
-                <div style={{ color: 'white', fontSize: '24px' }}>
-                  Inventory - Coming Soon
-                </div>
-              </div>
+              <Inventory
+                isOpen={true}
+                onClose={handleCloseOverlay}
+                items={convertInventoryToItems(playerInventory)}
+                maxWeight={stats.maxWeight}
+                currentWeight={stats.currentWeight}
+                onUseItem={(itemId) => {
+                  console.log(`[App] Use item: ${itemId}`)
+                  // TODO: Implement item usage through game
+                  handleCloseOverlay()
+                }}
+                onDropItem={(itemId, quantity) => {
+                  console.log(`[App] Drop item: ${itemId} x${quantity}`)
+                  // TODO: Implement item dropping through game
+                }}
+              />
             )}
 
             <div className="game-controls">

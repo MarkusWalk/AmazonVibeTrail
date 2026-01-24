@@ -155,7 +155,14 @@ export class Game {
     // Create sprite
     this.renderer.createEntitySprite(this.player, 'entities')
 
-    console.log('[Game] Player created')
+    // Give player starting items
+    this.player.addItem('harpoon', 5, 2)
+    this.player.addItem('health_potion', 3, 1)
+    this.player.addItem('dried_fish', 10, 1)
+    this.player.addItem('compass', 1, 1)
+    this.player.addItem('camera', 1, 3)
+
+    console.log('[Game] Player created with starting items')
   }
 
   /**
@@ -906,6 +913,13 @@ export class Game {
    */
   getPlayerStats() {
     return this.player ? this.player.getStats() : null
+  }
+
+  /**
+   * Get navigation manager (for map UI)
+   */
+  getNavigationManager() {
+    return this.navigationManager
   }
 
   /**
