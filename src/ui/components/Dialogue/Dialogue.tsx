@@ -1,23 +1,33 @@
 import React, { useState, useEffect } from 'react'
 import { Modal } from '../Modal'
+import { allDialogues } from '@data/dialogues/sampleDialogues'
 import type { DialogueTree, DialogueNode, DialogueChoice } from '@models/dialogue'
 import styles from './Dialogue.module.css'
 
 interface DialogueProps {
-  isOpen: boolean
+  dialogueId: string
   onClose: () => void
-  dialogueTree: DialogueTree | null
   onChoiceSelected?: (choiceId: string, choice: DialogueChoice) => void
   onDialogueComplete?: () => void
 }
 
 export const Dialogue: React.FC<DialogueProps> = ({
-  isOpen,
+  dialogueId,
   onClose,
-  dialogueTree,
   onChoiceSelected,
   onDialogueComplete,
 }) => {
+  const [dialogueTree, setDialogueTree] = useState<DialogueTree | null>(null)
+
+  // Load dialogue tree based on dialogueId
+  useEffect(() => {
+    const tree = allDialogues.find((d: DialogueTree) => d.id === dialogueId)
+    if (tree) {
+      setDialogueTree(tree)
+    } else {
+      console.warn(`[Dialogue] No dialogue tree found for ID: ${dialogueId}`)
+    }
+  }, [dialogueId])
   const [currentNode, setCurrentNode] = useState<DialogueNode | null>(null)
   const [textDisplay, setTextDisplay] = useState('')
   const [isTyping, setIsTyping] = useState(false)
@@ -25,7 +35,7 @@ export const Dialogue: React.FC<DialogueProps> = ({
 
   // Initialize dialogue
   useEffect(() => {
-    if (dialogueTree && isOpen) {
+    if (dialogueTree) {
       const startNode = dialogueTree.nodes.find(
         (n) => n.id === dialogueTree.startNodeId
       )
@@ -36,7 +46,7 @@ export const Dialogue: React.FC<DialogueProps> = ({
         setCanContinue(false)
       }
     }
-  }, [dialogueTree, isOpen])
+  }, [dialogueTree])
 
   // Typewriter effect
   useEffect(() => {
@@ -121,7 +131,7 @@ export const Dialogue: React.FC<DialogueProps> = ({
 
   return (
     <Modal
-      isOpen={isOpen}
+      isOpen={true}
       onClose={onClose}
       size="large"
       closeOnOverlayClick={false}

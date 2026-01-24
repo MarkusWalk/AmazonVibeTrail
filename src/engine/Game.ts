@@ -11,6 +11,7 @@ import {
 import { NavigationManager } from './navigation'
 import { EventManager, QuestManager, SpecimenManager } from './systems'
 import type { GameContext } from './systems/EventManager'
+import { UIEventManager } from '@ui/UIEventManager'
 import { amazonRiverMap } from '@data/maps/amazonRiver'
 import { sampleGameContent } from '@data/events/sampleEvents'
 import type { PixiRenderer } from '@rendering/pixi'
@@ -421,8 +422,15 @@ export class Game {
       switch (event.type) {
         case 'DIALOGUE':
           console.log(`[Game] Dialogue event: ${event.name}`)
-          // TODO: Open dialogue UI with event.data.dialogueId
-          // For now, just log and complete
+          // Open dialogue UI
+          if (event.data.dialogueId) {
+            this.engine.pause()
+            UIEventManager.openOverlay('dialogue', {
+              dialogueId: event.data.dialogueId as string,
+              characterName: event.data.characterName as string | undefined,
+              portrait: event.data.portrait as string | undefined,
+            })
+          }
           this.eventManager.completeEvent(event.id)
           break
 
@@ -438,6 +446,7 @@ export class Game {
               console.log(
                 `[Game] Discovered specimen: ${specimen.name} (${specimen.category})`
               )
+              // Could show a notification or open guidebook
             }
           }
           this.eventManager.completeEvent(event.id)
@@ -462,25 +471,65 @@ export class Game {
             player.takeDamage(event.data.damage as number)
             console.log(`[Game] Hazard dealt ${event.data.damage} damage`)
           }
+          // Apply other hazard effects
+          if (event.data.rationsDamage) {
+            const rationsLost = event.data.rationsDamage as number
+            player.consumeRations(rationsLost)
+            console.log(`[Game] Lost ${rationsLost} rations`)
+          }
           this.eventManager.completeEvent(event.id)
           break
 
         case 'TRADE':
           console.log(`[Game] Trade event: ${event.name}`)
-          // TODO: Open trade UI with event.data.merchantId
-          // For now, just log and complete
+          // Open trade UI
+          if (event.data.merchantId) {
+            this.engine.pause()
+            UIEventManager.openOverlay('trade', {
+              merchantId: event.data.merchantId as string,
+              merchantName: event.data.merchantName as string | undefined,
+            })
+          }
           this.eventManager.completeEvent(event.id)
           break
 
         case 'ENCOUNTER':
           console.log(`[Game] Encounter event: ${event.name}`)
-          // TODO: Handle encounter
+          // Handle hostile encounters
+          if (event.data.hostile && event.data.damage) {
+            player.takeDamage(event.data.damage as number)
+            console.log(`[Game] Hostile encounter dealt ${event.data.damage} damage`)
+          }
+          // Handle friendly encounters (could open dialogue)
+          if (event.data.dialogueId) {
+            this.engine.pause()
+            UIEventManager.openOverlay('dialogue', {
+              dialogueId: event.data.dialogueId as string,
+            })
+          }
           this.eventManager.completeEvent(event.id)
           break
 
         case 'ENVIRONMENTAL':
           console.log(`[Game] Environmental event: ${event.name}`)
-          // TODO: Apply environmental effect
+          // Apply environmental effects
+          if (event.data.speedModifier) {
+            const modifier = event.data.speedModifier as number
+            const currentMax = player.getMaxSpeed()
+            player.setMaxSpeed(currentMax * modifier)
+            console.log(`[Game] Speed modified by ${modifier}x`)
+            // Reset after duration
+            if (event.data.duration) {
+              setTimeout(() => {
+                player.setMaxSpeed(5) // Reset to default
+              }, event.data.duration as number)
+            }
+          }
+          // Weather effects
+          if (event.data.weatherEffect) {
+            console.log(`[Game] Weather: ${event.data.weatherEffect}`)
+            // Could apply visual filters via renderer
+          }
           this.eventManager.completeEvent(event.id)
           break
 
@@ -578,8 +627,8 @@ export class Game {
         gameTime: this.gameTime,
         distanceTraveled: stats.distance,
         health: stats.health,
-        rations: 100, // TODO: Add rations system
-        inventory: new Map(), // TODO: Build from player inventory
+        rations: stats.rations,
+        inventory: this.player.getInventory(),
       }
 
       const triggeredEvents = this.eventManager.checkTriggers(gameContext)

@@ -4,6 +4,8 @@ import { Game } from '@engine/Game'
 import { PixiRenderer } from '@rendering/pixi'
 import { GameState } from '@models/index'
 import { Dashboard } from './ui/components/Dashboard'
+import { Dialogue } from './ui/components/Dialogue'
+import { UIEventManager, type UIOverlayType, type UIEventData } from './ui/UIEventManager'
 import type { QuickSlotItem, StatusEffect } from './ui/components/Dashboard'
 import './App.css'
 
@@ -18,6 +20,7 @@ function App() {
     speed: 0,
   })
   const [rations, setRations] = useState(100)
+  const [maxRations, setMaxRations] = useState(100)
   const [direction, setDirection] = useState(180) // Facing south (downstream)
   const [quickSlots] = useState<(QuickSlotItem | null)[]>([
     { id: 'harpoon', name: 'Harpoon', icon: '🔱', count: 5 },
@@ -28,6 +31,8 @@ function App() {
   ])
   const [selectedSlot, setSelectedSlot] = useState(0)
   const [statuses, setStatuses] = useState<StatusEffect[]>([])
+  const [currentOverlay, setCurrentOverlay] = useState<UIOverlayType>(null)
+  const [overlayData, setOverlayData] = useState<UIEventData | undefined>()
   const canvasContainerRef = useRef<HTMLDivElement>(null)
   const gameRef = useRef<Game | null>(null)
   const rendererRef = useRef<PixiRenderer | null>(null)
@@ -43,12 +48,19 @@ function App() {
       setGameState(newState)
     })
 
+    // Subscribe to UI overlay events
+    const unsubscribe = UIEventManager.subscribe((overlay, data) => {
+      setCurrentOverlay(overlay)
+      setOverlayData(data)
+    })
+
     // Transition to menu after boot
     setTimeout(() => {
       stateManager.setState(GameState.MENU)
     }, 1000)
 
     return () => {
+      unsubscribe()
       if (gameRef.current) {
         gameRef.current.destroy()
       }
@@ -143,8 +155,9 @@ function App() {
           const angle = playerStats.angle || 0
           setDirection((angle * 180 / Math.PI) + 180) // Convert to compass degrees
 
-          // Decrease rations over time (simulate consumption)
-          setRations(prev => Math.max(0, prev - 0.05))
+          // Update rations from player stats
+          setRations(playerStats.rations)
+          setMaxRations(playerStats.maxRations)
 
           // Update status effects based on player state
           const newStatuses: StatusEffect[] = []
@@ -197,6 +210,14 @@ function App() {
     }
     if (stateManagerRef.current) {
       stateManagerRef.current.setState(GameState.MENU)
+    }
+  }
+
+  const handleCloseOverlay = () => {
+    UIEventManager.closeOverlay()
+    // Resume game if it was paused
+    if (gameRef.current) {
+      gameRef.current.resume()
     }
   }
 
@@ -256,7 +277,7 @@ function App() {
               health={stats.health}
               maxHealth={100}
               rations={rations}
-              maxRations={100}
+              maxRations={maxRations}
               direction={direction}
               location={`Score: ${stats.score} | Distance: ${stats.distance}m`}
               quickSlots={quickSlots}
@@ -265,10 +286,82 @@ function App() {
               onSlotClick={(index) => setSelectedSlot(index)}
             />
 
+            {/* UI Overlays */}
+            {currentOverlay === 'dialogue' && overlayData && 'dialogueId' in overlayData && (
+              <Dialogue
+                dialogueId={overlayData.dialogueId as string}
+                onClose={handleCloseOverlay}
+              />
+            )}
+
+            {currentOverlay === 'map' && (
+              <div style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                zIndex: 1000,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+                <button
+                  onClick={handleCloseOverlay}
+                  style={{
+                    position: 'absolute',
+                    top: '20px',
+                    right: '20px',
+                    padding: '10px 20px',
+                    fontSize: '16px',
+                  }}
+                >
+                  Close Map
+                </button>
+                <div style={{ color: 'white', fontSize: '24px' }}>
+                  Interactive Map - Coming Soon
+                </div>
+              </div>
+            )}
+
+            {currentOverlay === 'inventory' && (
+              <div style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                zIndex: 1000,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+                <button
+                  onClick={handleCloseOverlay}
+                  style={{
+                    position: 'absolute',
+                    top: '20px',
+                    right: '20px',
+                    padding: '10px 20px',
+                    fontSize: '16px',
+                  }}
+                >
+                  Close Inventory
+                </button>
+                <div style={{ color: 'white', fontSize: '24px' }}>
+                  Inventory - Coming Soon
+                </div>
+              </div>
+            )}
+
             <div className="game-controls">
               <button onClick={handlePauseGame}>⏸️ Pause</button>
               <button onClick={handleResumeGame}>▶️ Resume</button>
               <button onClick={handleStopGame}>⏹️ Stop</button>
+              <button onClick={() => UIEventManager.openOverlay('map')}>🗺️ Map</button>
+              <button onClick={() => UIEventManager.openOverlay('inventory')}>🎒 Inventory</button>
             </div>
           </div>
         )}
