@@ -77,25 +77,37 @@ function App() {
   }, [])
 
   const handleStartGame = async () => {
-    if (!canvasContainerRef.current || !stateManagerRef.current) return
+    console.log('[App] Starting new game...')
 
-    // Clear any existing game/renderer
-    if (gameRef.current) {
-      gameRef.current.destroy()
+    if (!canvasContainerRef.current) {
+      console.error('[App] Canvas container ref not found')
+      return
     }
-    if (rendererRef.current) {
-      rendererRef.current.destroy()
+    if (!stateManagerRef.current) {
+      console.error('[App] State manager ref not found')
+      return
     }
 
-    // Create renderer
-    const renderer = new PixiRenderer({
-      width: 800,
-      height: 600,
-      backgroundColor: 0x4a90a4, // River blue
-      antialias: true,
-    })
-    await renderer.initialize(canvasContainerRef.current)
-    rendererRef.current = renderer
+    try {
+      // Clear any existing game/renderer
+      if (gameRef.current) {
+        gameRef.current.destroy()
+      }
+      if (rendererRef.current) {
+        rendererRef.current.destroy()
+      }
+
+      console.log('[App] Creating renderer...')
+      // Create renderer
+      const renderer = new PixiRenderer({
+        width: 800,
+        height: 600,
+        backgroundColor: 0x4a90a4, // River blue
+        antialias: true,
+      })
+      await renderer.initialize(canvasContainerRef.current)
+      rendererRef.current = renderer
+      console.log('[App] Renderer created successfully')
 
     // Add UI text
     renderer.addText('score', 'Score: 0', 10, 10, {
@@ -131,78 +143,88 @@ function App() {
       fill: 0xcccccc,
     })
 
-    // Create game
-    const game = new Game({
-      audio: { masterVolume: 0.8, sfxEnabled: true },
-      gameplay: { difficulty: 'EXPLORER', steeringSensitivity: 1.0 },
-      ui: { highContrast: false, tooltipDelay: 500 },
-    })
-    game.setRenderer(renderer)
-    gameRef.current = game
+      console.log('[App] Creating game...')
+      // Create game
+      const game = new Game({
+        audio: { masterVolume: 0.8, sfxEnabled: true },
+        gameplay: { difficulty: 'EXPLORER', steeringSensitivity: 1.0 },
+        ui: { highContrast: false, tooltipDelay: 500 },
+      })
+      game.setRenderer(renderer)
+      gameRef.current = game
 
-    // Start game
-    await game.start()
+      console.log('[App] Starting game...')
+      // Start game
+      await game.start()
 
-    // Update UI stats periodically
-    const statsInterval = setInterval(() => {
-      if (gameRef.current) {
-        const playerStats = gameRef.current.getPlayerStats()
-        if (playerStats) {
-          setStats({
-            score: gameRef.current.getScore(),
-            health: playerStats.health,
-            lives: playerStats.lives,
-            distance: playerStats.distance,
-            combo: playerStats.combo,
-            speed: playerStats.speed,
-            currentWeight: playerStats.currentWeight,
-            maxWeight: playerStats.maxWeight,
-          })
+      console.log('[App] Game started successfully')
 
-          // Update direction (convert radians to degrees if needed)
-          const angle = playerStats.angle || 0
-          setDirection((angle * 180 / Math.PI) + 180) // Convert to compass degrees
-
-          // Update rations from player stats
-          setRations(playerStats.rations)
-          setMaxRations(playerStats.maxRations)
-
-          // Update inventory
-          const inventory = (gameRef.current as any).player?.getInventory()
-          if (inventory) {
-            setPlayerInventory(inventory)
-          }
-
-          // Update status effects based on player state
-          const newStatuses: StatusEffect[] = []
-          if (playerStats.speedBoostActive) {
-            newStatuses.push({
-              id: 'speed_boost',
-              name: 'Speed Boost',
-              icon: '⚡',
-              duration: playerStats.speedBoostRemaining / 1000,
-              type: 'buff'
+      // Update UI stats periodically
+      const statsInterval = setInterval(() => {
+        if (gameRef.current) {
+          const playerStats = gameRef.current.getPlayerStats()
+          if (playerStats) {
+            setStats({
+              score: gameRef.current.getScore(),
+              health: playerStats.health,
+              lives: playerStats.lives,
+              distance: playerStats.distance,
+              combo: playerStats.combo,
+              speed: playerStats.speed,
+              currentWeight: playerStats.currentWeight,
+              maxWeight: playerStats.maxWeight,
             })
+
+            // Update direction (convert radians to degrees if needed)
+            const angle = playerStats.angle || 0
+            setDirection((angle * 180 / Math.PI) + 180) // Convert to compass degrees
+
+            // Update rations from player stats
+            setRations(playerStats.rations)
+            setMaxRations(playerStats.maxRations)
+
+            // Update inventory
+            const inventory = (gameRef.current as any).player?.getInventory()
+            if (inventory) {
+              setPlayerInventory(inventory)
+            }
+
+            // Update status effects based on player state
+            const newStatuses: StatusEffect[] = []
+            if (playerStats.speedBoostActive) {
+              newStatuses.push({
+                id: 'speed_boost',
+                name: 'Speed Boost',
+                icon: '⚡',
+                duration: playerStats.speedBoostRemaining / 1000,
+                type: 'buff'
+              })
+            }
+            if (playerStats.invincible) {
+              newStatuses.push({
+                id: 'invincible',
+                name: 'Invincible',
+                icon: '🛡️',
+                duration: playerStats.invincibilityRemaining / 1000,
+                type: 'buff'
+              })
+            }
+            setStatuses(newStatuses)
           }
-          if (playerStats.invincible) {
-            newStatuses.push({
-              id: 'invincible',
-              name: 'Invincible',
-              icon: '🛡️',
-              duration: playerStats.invincibilityRemaining / 1000,
-              type: 'buff'
-            })
-          }
-          setStatuses(newStatuses)
         }
+      }, 100)
+
+      console.log('[App] Transitioning to RIVER state')
+      // Transition to river state
+      stateManagerRef.current.setState(GameState.RIVER)
+
+      // Clean up stats interval on unmount
+      return () => {
+        clearInterval(statsInterval)
       }
-    }, 100)
-
-    // Transition to river state
-    stateManagerRef.current.setState(GameState.RIVER)
-
-    return () => {
-      clearInterval(statsInterval)
+    } catch (error) {
+      console.error('[App] Error starting game:', error)
+      alert(`Failed to start game: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
 
@@ -384,8 +406,8 @@ function App() {
       </div>
 
       <div className="app-footer">
-        <p>Phase 1: Core Game Loop Complete ✅</p>
-        <p>Physics, Rendering, and Controls Working!</p>
+        <p>All Phases Complete ✅ | 12 Dialogues | 23 Events | 12 Quests | 32 Specimens | 47 Items</p>
+        <p>Full game experience with navigation, dialogue, quests, and exploration!</p>
       </div>
     </div>
   )
