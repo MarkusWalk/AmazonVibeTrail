@@ -26,6 +26,7 @@
       "@/*": ["src/*"],
       "@engine/*": ["src/engine/*"],
       "@rendering/*": ["src/rendering/*"],
+      "@audio/*": ["src/audio/*"],
       "@ui/*": ["src/ui/*"],
       "@state/*": ["src/state/*"],
       "@data/*": ["src/data/*"],

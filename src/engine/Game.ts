@@ -12,6 +12,9 @@ import { NavigationManager } from './navigation'
 import { EventManager, QuestManager, SpecimenManager } from './systems'
 import type { GameContext } from './systems/EventManager'
 import { UIEventManager } from '@ui/UIEventManager'
+import { audioManager } from '@audio/AudioManager'
+import { ParticleManager } from '@rendering/effects/ParticleManager'
+import { performanceMonitor } from '@utils/PerformanceMonitor'
 import { amazonRiverMap } from '@data/maps/amazonRiver'
 import { sampleGameContent } from '@data/events/sampleEvents'
 import type { PixiRenderer } from '@rendering/pixi'
@@ -32,6 +35,9 @@ export class Game {
   private eventManager: EventManager
   private questManager: QuestManager
   private specimenManager: SpecimenManager
+
+  // Phase 6 Visual Effects
+  private particleManager: ParticleManager | null = null
 
   // Game state
   private score: number = 0
@@ -62,7 +68,11 @@ export class Game {
     this.questManager = new QuestManager()
     this.specimenManager = new SpecimenManager()
 
-    console.log('[Game] Initialized with navigation and content systems')
+    // Initialize audio system
+    audioManager.initialize()
+    audioManager.setMasterVolume(config.audio?.masterVolume || 0.8)
+
+    console.log('[Game] Initialized with navigation, content, and audio systems')
   }
 
   /**
@@ -100,6 +110,13 @@ export class Game {
     this.renderer.createBackground()
     this.renderer.createWaterEffect()
 
+    // Initialize particle system
+    const waterLayer = this.renderer.getLayer('water')
+    if (waterLayer) {
+      this.particleManager = new ParticleManager(waterLayer)
+      console.log('[Game] Particle system initialized')
+    }
+
     // Subscribe to engine tick for rendering
     this.engine.subscribe('tick', (deltaTime) => {
       this.onTick(deltaTime)
@@ -115,6 +132,11 @@ export class Game {
 
     // Start engine
     this.engine.start()
+
+    // Performance monitoring - log report every 30 seconds
+    setInterval(() => {
+      performanceMonitor.logReport()
+    }, 30000)
 
     console.log('[Game] Started with navigation to Breves')
   }
@@ -351,6 +373,28 @@ export class Game {
         this.handleCollectiblePickup(collectible)
       }
     }
+
+    // Check if player hit an obstacle
+    if (
+      (entityA === this.player && entityB instanceof Obstacle) ||
+      (entityB === this.player && entityA instanceof Obstacle)
+    ) {
+      const obstacle = (entityA instanceof Obstacle ? entityA : entityB) as Obstacle
+      const pos = obstacle.getPosition()
+
+      // Play collision sound
+      audioManager.playSFX('collision', 0.9)
+
+      // Screen shake effect
+      if (this.renderer) {
+        this.renderer.shakeScreen(15, 0.3)
+      }
+
+      // Impact particles
+      if (this.particleManager) {
+        this.particleManager.createImpact(pos.x, pos.y)
+      }
+    }
   }
 
   /**
@@ -361,22 +405,43 @@ export class Game {
 
     const type = collectible.getCollectibleType()
     const value = collectible.getValue()
+    const pos = collectible.getPosition()
 
+    // Create visual effects based on collectible type
     switch (type) {
       case CollectibleType.FISH:
         this.score += value
+        audioManager.playSFX('collect', 0.8)
+        // Water splash for fish
+        if (this.particleManager) {
+          this.particleManager.createWaterSplash(pos.x, pos.y)
+        }
         break
 
       case CollectibleType.HEALTH_PACK:
         this.player.heal(value)
+        audioManager.playSFX('collect', 1.0)
+        // Green sparkle for health
+        if (this.particleManager) {
+          this.particleManager.createSparkle(pos.x, pos.y, 0x00ff00)
+        }
         break
 
       case CollectibleType.SPEED_BOOST:
         this.player.applySpeedBoost(value * 1000)
+        audioManager.playSFX('collect', 1.0)
+        // Yellow sparkle for speed boost
+        if (this.particleManager) {
+          this.particleManager.createSparkle(pos.x, pos.y, 0xffff00)
+        }
         break
 
       case CollectibleType.SPECIMEN:
         this.score += value
+        // Purple sparkle for specimens
+        if (this.particleManager) {
+          this.particleManager.createSparkle(pos.x, pos.y, 0xff00ff)
+        }
         // Handle specimen discovery
         // For now, trigger a random specimen discovery
         const allSpecimens = Array.from(
@@ -737,6 +802,23 @@ export class Game {
       this.spawnWhirlpool()
       this.whirlpoolSpawnTimer = 0
     }
+
+    // Update particle effects
+    if (this.particleManager) {
+      this.particleManager.update(deltaTime)
+    }
+
+    // Update renderer effects (screen shake)
+    this.renderer.update(deltaTime)
+
+    // Update performance monitoring
+    performanceMonitor.update(deltaTime)
+    performanceMonitor.setEntityCount(this.engine.getAllEntities().length)
+    if (this.particleManager) {
+      performanceMonitor.setParticleCount(this.particleManager.getParticleCount())
+    }
+    const physics = this.engine.getPhysics()
+    performanceMonitor.setPhysicsBodyCount(physics.getAllBodyIds().length)
 
     // Check if player is dead
     if (!this.player.isAlive()) {
