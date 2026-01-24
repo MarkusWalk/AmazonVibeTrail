@@ -392,11 +392,188 @@ export const sampleSpecimens: Specimen[] = [
     image: 'mineral_gold',
     value: 175,
   },
+  // Additional specimens
+  {
+    id: 'plant_rubber_tree',
+    name: 'Rubber Tree Latex',
+    category: 'plant',
+    rarity: 'common',
+    description:
+      'Latex sap from Hevea brasiliensis, the source of natural rubber that drove the Amazon rubber boom.',
+    image: 'plant_rubber',
+    value: 60,
+  },
+  {
+    id: 'plant_cacao',
+    name: 'Cacao Pod',
+    category: 'plant',
+    rarity: 'uncommon',
+    description:
+      'The pod of Theobroma cacao, source of chocolate, native to the Amazon.',
+    image: 'plant_cacao',
+    value: 45,
+  },
+  {
+    id: 'creature_capybara',
+    name: 'Capybara Tooth',
+    category: 'animal',
+    rarity: 'common',
+    description:
+      'Tooth from the world\'s largest rodent, semi-aquatic and native to South America.',
+    image: 'creature_capybara',
+    value: 25,
+  },
+  {
+    id: 'creature_anaconda',
+    name: 'Anaconda Scale',
+    category: 'animal',
+    rarity: 'rare',
+    description:
+      'Scale from a green anaconda, one of the largest snakes in the world.',
+    image: 'creature_anaconda',
+    value: 100,
+  },
+  {
+    id: 'creature_sloth',
+    name: 'Three-toed Sloth Claw',
+    category: 'animal',
+    rarity: 'uncommon',
+    description:
+      'Claw from a three-toed sloth, known for its slow movement through the canopy.',
+    image: 'creature_sloth',
+    value: 50,
+  },
+  {
+    id: 'artifact_inca_figurine',
+    name: 'Inca Figurine',
+    category: 'artifact',
+    rarity: 'legendary',
+    description:
+      'A small golden figurine of an Inca deity, incredibly rare and valuable.',
+    image: 'artifact_figurine',
+    value: 500,
+  },
 ]
+
+// Additional quests
+const additionalQuests: Quest[] = [
+  {
+    id: 'rubber_collection_quest',
+    name: 'The Rubber Baron\'s Contract',
+    description: 'Collect rubber for the baron',
+    status: QuestStatus.AVAILABLE,
+    objectives: [
+      {
+        id: 'collect_rubber',
+        description: 'Collect rubber latex',
+        type: 'collect',
+        target: 'rubber',
+        current: 0,
+        required: 10,
+        completed: false,
+      },
+    ],
+    rewards: [
+      {
+        type: 'gold',
+        target: 'player',
+        amount: 100,
+      },
+    ],
+  },
+  {
+    id: 'botanical_specimens_quest',
+    name: 'Scientific Discovery',
+    description: 'Help Dr. Santos collect rare specimens',
+    status: QuestStatus.AVAILABLE,
+    objectives: [
+      {
+        id: 'find_macaw',
+        description: 'Find a scarlet macaw specimen',
+        type: 'collect',
+        target: 'creature_macaw',
+        current: 0,
+        required: 1,
+        completed: false,
+      },
+      {
+        id: 'find_dolphin',
+        description: 'Find a pink river dolphin specimen',
+        type: 'collect',
+        target: 'creature_dolphin_pink',
+        current: 0,
+        required: 1,
+        completed: false,
+      },
+      {
+        id: 'find_lily',
+        description: 'Find Victoria amazonica water lily',
+        type: 'collect',
+        target: 'plant_victoria_lily',
+        current: 0,
+        required: 1,
+        completed: false,
+      },
+    ],
+    rewards: [
+      {
+        type: 'gold',
+        target: 'player',
+        amount: 200,
+      },
+      {
+        type: 'item',
+        target: 'camera',
+        amount: 1,
+      },
+    ],
+  },
+  {
+    id: 'lost_expedition_quest',
+    name: 'The Lost Expedition',
+    description: 'Find the remains of the lost Fawcett expedition',
+    status: QuestStatus.AVAILABLE,
+    objectives: [
+      {
+        id: 'reach_lost_city',
+        description: 'Reach the coordinates of the lost city',
+        type: 'reach',
+        target: 'vilcabamba',
+        current: 0,
+        required: 1,
+        completed: false,
+      },
+      {
+        id: 'find_artifact',
+        description: 'Find an artifact from the expedition',
+        type: 'discover',
+        target: 'artifact_expedition_journal',
+        current: 0,
+        required: 1,
+        completed: false,
+      },
+    ],
+    rewards: [
+      {
+        type: 'gold',
+        target: 'player',
+        amount: 500,
+      },
+      {
+        type: 'item',
+        target: 'artifact_inca_figurine',
+        amount: 1,
+      },
+    ],
+  },
+]
+
+// Combine all quests
+const allQuests = [...sampleQuests, ...additionalQuests]
 
 // Export all sample content
 export const sampleGameContent = {
   events: sampleEvents,
-  quests: sampleQuests,
+  quests: allQuests,
   specimens: sampleSpecimens,
 }

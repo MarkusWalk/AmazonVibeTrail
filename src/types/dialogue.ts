@@ -22,8 +22,12 @@ export interface DialogueChoice {
 }
 
 export interface DialogueEffect {
-  type: 'add_item' | 'remove_item' | 'change_health' | 'change_rations' | 'unlock_location'
-  payload: unknown
+  type: 'add_item' | 'remove_item' | 'change_health' | 'change_rations' | 'unlock_location' | 'GIVE_ITEM' | 'START_QUEST' | 'OPEN_TRADE'
+  payload?: unknown
+  itemId?: string
+  quantity?: number
+  questId?: string
+  merchantId?: string
 }
 
 export interface DialogueTree {

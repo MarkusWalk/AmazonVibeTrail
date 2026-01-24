@@ -122,7 +122,7 @@ export interface Quest {
 }
 
 export interface QuestReward {
-  type: 'item' | 'health' | 'rations' | 'unlock'
+  type: 'item' | 'health' | 'rations' | 'unlock' | 'gold'
   target: string
   amount: number
 }
