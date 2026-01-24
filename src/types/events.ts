@@ -21,11 +21,12 @@ export enum TriggerType {
   TIME = 'TIME',
   DISTANCE = 'DISTANCE',
   HEALTH = 'HEALTH',
+  RATIONS = 'RATIONS',
   ITEM = 'ITEM',
 }
 
 export interface EventCondition {
-  type: 'flag' | 'item' | 'health' | 'location' | 'distance' | 'time'
+  type: 'flag' | 'item' | 'health' | 'rations' | 'location' | 'distance' | 'time'
   operator?: 'equals' | 'greater' | 'less' | 'has' | 'not'
   key: string
   value?: unknown
@@ -53,21 +54,28 @@ export interface EventData {
   dialogueId?: string
 
   // Hazard event
-  hazardType?: 'storm' | 'rapids' | 'whirlpool' | 'rocks'
+  hazardType?: 'storm' | 'rapids' | 'whirlpool' | 'rocks' | 'wildlife' | 'flood'
   damage?: number
 
   // Discovery event
-  discoveryType?: 'specimen' | 'location' | 'npc' | 'item'
+  discoveryType?: 'specimen' | 'location' | 'npc' | 'item' | 'artifact'
   discoveryId?: string
 
   // Trade event
   merchantId?: string
+  merchantName?: string
 
   // Quest event
   questId?: string
 
   // Encounter event
   encounterId?: string
+  hostile?: boolean
+
+  // Environmental event
+  speedModifier?: number
+  duration?: number
+  weatherEffect?: string
 
   // Generic data
   [key: string]: unknown
