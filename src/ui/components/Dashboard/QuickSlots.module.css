@@ -1,0 +1,97 @@
+.quickSlots {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #e5e7eb;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.slotsContainer {
+  display: flex;
+  gap: 8px;
+}
+
+.slot {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(to bottom, #1f2937, #111827);
+  border: 2px solid rgba(139, 69, 19, 0.6);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.slot:hover {
+  border-color: rgba(212, 175, 55, 0.8);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.6),
+    0 0 8px rgba(212, 175, 55, 0.4);
+}
+
+.slot.selected {
+  border-color: #d4af37;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.6),
+    0 0 12px rgba(212, 175, 55, 0.6);
+}
+
+.slot.filled {
+  background: linear-gradient(to bottom, #2d4a3e, #1a2f26);
+}
+
+.icon {
+  font-size: 32px;
+  z-index: 2;
+  filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.8));
+}
+
+.count {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 4px;
+  min-width: 20px;
+  text-align: center;
+  z-index: 3;
+}
+
+.cooldown {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 0 0 6px 6px;
+  transition: height 0.1s linear;
+  z-index: 1;
+}
+
+.keybind {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  font-size: 10px;
+  font-weight: bold;
+  color: #6b7280;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 2px 4px;
+  border-radius: 2px;
+  z-index: 2;
+}

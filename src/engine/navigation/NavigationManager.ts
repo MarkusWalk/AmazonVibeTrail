@@ -17,6 +17,7 @@ export class NavigationManager {
   private currentSegment: RiverSegment | null = null
   private upcomingFork: ForkChoice[] | null = null
   private forkDecisionDistance: number = 200 // Distance before fork to show choices
+  private visitedNodes: Set<string> = new Set()
 
   constructor(mapGraph: MapGraph, startNodeId: string) {
     this.mapGraph = mapGraph
@@ -28,6 +29,8 @@ export class NavigationManager {
       totalSegmentLength: 0,
       progressPercent: 0,
     }
+    // Mark starting node as visited
+    this.visitedNodes.add(startNodeId)
   }
 
   /**
@@ -109,6 +112,9 @@ export class NavigationManager {
     this.navigationState.progressPercent = 0
     this.currentSegment = null
     this.upcomingFork = null
+
+    // Mark node as visited
+    this.visitedNodes.add(nodeId)
   }
 
   /**
@@ -289,5 +295,19 @@ export class NavigationManager {
    */
   getAllSegments(): RiverSegment[] {
     return this.mapGraph.segments
+  }
+
+  /**
+   * Get the map graph
+   */
+  getMapGraph(): MapGraph {
+    return this.mapGraph
+  }
+
+  /**
+   * Get visited node IDs
+   */
+  getVisitedNodes(): string[] {
+    return Array.from(this.visitedNodes)
   }
 }

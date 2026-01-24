@@ -9,9 +9,16 @@ import {
   Fork,
 } from './entities'
 import { NavigationManager } from './navigation'
+import { EventManager, QuestManager, SpecimenManager } from './systems'
+import type { GameContext } from './systems/EventManager'
+import { UIEventManager } from '@ui/UIEventManager'
+import { audioManager } from '@audio/AudioManager'
+import { ParticleManager } from '@rendering/effects/ParticleManager'
+import { performanceMonitor } from '@utils/PerformanceMonitor'
 import { amazonRiverMap } from '@data/maps/amazonRiver'
+import { sampleGameContent } from '@data/events/sampleEvents'
 import type { PixiRenderer } from '@rendering/pixi'
-import type { GameConfig } from '@models/index'
+import type { GameConfig, GameEvent } from '@models/index'
 
 /**
  * Game - Main game coordinator
@@ -23,6 +30,14 @@ export class Game {
   private inputRouter: InputRouter
   private player: Player | null = null
   private navigationManager: NavigationManager
+
+  // Phase 5 Content Systems
+  private eventManager: EventManager
+  private questManager: QuestManager
+  private specimenManager: SpecimenManager
+
+  // Phase 6 Visual Effects
+  private particleManager: ParticleManager | null = null
 
   // Game state
   private score: number = 0
@@ -48,7 +63,16 @@ export class Game {
     // Initialize navigation with Amazon River map
     this.navigationManager = new NavigationManager(amazonRiverMap, 'belem')
 
-    console.log('[Game] Initialized with navigation system')
+    // Initialize Phase 5 content systems
+    this.eventManager = new EventManager()
+    this.questManager = new QuestManager()
+    this.specimenManager = new SpecimenManager()
+
+    // Initialize audio system
+    audioManager.initialize()
+    audioManager.setMasterVolume(config.audio?.masterVolume || 0.8)
+
+    console.log('[Game] Initialized with navigation, content, and audio systems')
   }
 
   /**
@@ -71,12 +95,27 @@ export class Game {
     // Create player
     this.createPlayer()
 
+    // Register sample content
+    this.eventManager.registerEvents(sampleGameContent.events)
+    sampleGameContent.quests.forEach((quest) =>
+      this.questManager.registerQuest(quest)
+    )
+    this.specimenManager.registerSpecimens(sampleGameContent.specimens)
+    console.log('[Game] Registered sample content')
+
     // Create initial obstacles
     this.spawnObstacle()
 
     // Set up render background
     this.renderer.createBackground()
     this.renderer.createWaterEffect()
+
+    // Initialize particle system
+    const waterLayer = this.renderer.getLayer('water')
+    if (waterLayer) {
+      this.particleManager = new ParticleManager(waterLayer)
+      console.log('[Game] Particle system initialized')
+    }
 
     // Subscribe to engine tick for rendering
     this.engine.subscribe('tick', (deltaTime) => {
@@ -93,6 +132,11 @@ export class Game {
 
     // Start engine
     this.engine.start()
+
+    // Performance monitoring - log report every 30 seconds
+    setInterval(() => {
+      performanceMonitor.logReport()
+    }, 30000)
 
     console.log('[Game] Started with navigation to Breves')
   }
@@ -133,7 +177,14 @@ export class Game {
     // Create sprite
     this.renderer.createEntitySprite(this.player, 'entities')
 
-    console.log('[Game] Player created')
+    // Give player starting items
+    this.player.addItem('harpoon', 5, 2)
+    this.player.addItem('health_potion', 3, 1)
+    this.player.addItem('dried_fish', 10, 1)
+    this.player.addItem('compass', 1, 1)
+    this.player.addItem('camera', 1, 3)
+
+    console.log('[Game] Player created with starting items')
   }
 
   /**
@@ -322,6 +373,28 @@ export class Game {
         this.handleCollectiblePickup(collectible)
       }
     }
+
+    // Check if player hit an obstacle
+    if (
+      (entityA === this.player && entityB instanceof Obstacle) ||
+      (entityB === this.player && entityA instanceof Obstacle)
+    ) {
+      const obstacle = (entityA instanceof Obstacle ? entityA : entityB) as Obstacle
+      const pos = obstacle.getPosition()
+
+      // Play collision sound
+      audioManager.playSFX('collision', 0.9)
+
+      // Screen shake effect
+      if (this.renderer) {
+        this.renderer.shakeScreen(15, 0.3)
+      }
+
+      // Impact particles
+      if (this.particleManager) {
+        this.particleManager.createImpact(pos.x, pos.y)
+      }
+    }
   }
 
   /**
@@ -332,26 +405,211 @@ export class Game {
 
     const type = collectible.getCollectibleType()
     const value = collectible.getValue()
+    const pos = collectible.getPosition()
 
+    // Create visual effects based on collectible type
     switch (type) {
       case CollectibleType.FISH:
         this.score += value
+        audioManager.playSFX('collect', 0.8)
+        // Water splash for fish
+        if (this.particleManager) {
+          this.particleManager.createWaterSplash(pos.x, pos.y)
+        }
         break
 
       case CollectibleType.HEALTH_PACK:
         this.player.heal(value)
+        audioManager.playSFX('collect', 1.0)
+        // Green sparkle for health
+        if (this.particleManager) {
+          this.particleManager.createSparkle(pos.x, pos.y, 0x00ff00)
+        }
         break
 
       case CollectibleType.SPEED_BOOST:
         this.player.applySpeedBoost(value * 1000)
+        audioManager.playSFX('collect', 1.0)
+        // Yellow sparkle for speed boost
+        if (this.particleManager) {
+          this.particleManager.createSparkle(pos.x, pos.y, 0xffff00)
+        }
         break
 
       case CollectibleType.SPECIMEN:
         this.score += value
+        // Purple sparkle for specimens
+        if (this.particleManager) {
+          this.particleManager.createSparkle(pos.x, pos.y, 0xff00ff)
+        }
+        // Handle specimen discovery
+        // For now, trigger a random specimen discovery
+        const allSpecimens = Array.from(
+          sampleGameContent.specimens.map((s) => s.id)
+        )
+        const randomSpecimen =
+          allSpecimens[Math.floor(Math.random() * allSpecimens.length)]
+        const currentNode = this.navigationManager.getCurrentNode()
+        const specimen = this.specimenManager.discoverSpecimen(
+          randomSpecimen,
+          currentNode?.name
+        )
+        if (specimen) {
+          console.log(`[Game] Discovered specimen: ${specimen.name}`)
+
+          // Check for collection quests
+          const activeQuests = this.questManager.getActiveQuests()
+          activeQuests.forEach((quest) => {
+            quest.objectives.forEach((objective) => {
+              if (
+                objective.type === 'collect' &&
+                objective.target === specimen.id
+              ) {
+                this.questManager.incrementObjective(quest.id, objective.id, 1)
+                console.log(
+                  `[Game] Quest progress: ${objective.description} (${objective.current}/${objective.required})`
+                )
+              }
+            })
+          })
+        }
         break
     }
 
     console.log(`[Game] Collected ${type}, value: ${value}`)
+  }
+
+  /**
+   * Handle triggered events from EventManager
+   */
+  private handleTriggeredEvents(events: GameEvent[]): void {
+    const player = this.player
+    if (!player) return
+
+    events.forEach((event) => {
+      // Trigger the event
+      this.eventManager.triggerEvent(event.id)
+
+      // Handle different event types
+      switch (event.type) {
+        case 'DIALOGUE':
+          console.log(`[Game] Dialogue event: ${event.name}`)
+          // Open dialogue UI
+          if (event.data.dialogueId) {
+            this.engine.pause()
+            UIEventManager.openOverlay('dialogue', {
+              dialogueId: event.data.dialogueId as string,
+              characterName: event.data.characterName as string | undefined,
+              portrait: event.data.portrait as string | undefined,
+            })
+          }
+          this.eventManager.completeEvent(event.id)
+          break
+
+        case 'DISCOVERY':
+          console.log(`[Game] Discovery event: ${event.name}`)
+          if (event.data.discoveryType === 'specimen' && event.data.discoveryId) {
+            const currentNode = this.navigationManager.getCurrentNode()
+            const specimen = this.specimenManager.discoverSpecimen(
+              event.data.discoveryId as string,
+              currentNode?.name
+            )
+            if (specimen) {
+              console.log(
+                `[Game] Discovered specimen: ${specimen.name} (${specimen.category})`
+              )
+              // Could show a notification or open guidebook
+            }
+          }
+          this.eventManager.completeEvent(event.id)
+          break
+
+        case 'QUEST':
+          console.log(`[Game] Quest event: ${event.name}`)
+          if (event.data.questId) {
+            const started = this.questManager.startQuest(
+              event.data.questId as string
+            )
+            if (started) {
+              console.log(`[Game] Started quest: ${event.data.questId}`)
+            }
+          }
+          this.eventManager.completeEvent(event.id)
+          break
+
+        case 'HAZARD':
+          console.log(`[Game] Hazard event: ${event.name}`)
+          if (event.data.damage) {
+            player.takeDamage(event.data.damage as number)
+            console.log(`[Game] Hazard dealt ${event.data.damage} damage`)
+          }
+          // Apply other hazard effects
+          if (event.data.rationsDamage) {
+            const rationsLost = event.data.rationsDamage as number
+            player.consumeRations(rationsLost)
+            console.log(`[Game] Lost ${rationsLost} rations`)
+          }
+          this.eventManager.completeEvent(event.id)
+          break
+
+        case 'TRADE':
+          console.log(`[Game] Trade event: ${event.name}`)
+          // Open trade UI
+          if (event.data.merchantId) {
+            this.engine.pause()
+            UIEventManager.openOverlay('trade', {
+              merchantId: event.data.merchantId as string,
+              merchantName: event.data.merchantName as string | undefined,
+            })
+          }
+          this.eventManager.completeEvent(event.id)
+          break
+
+        case 'ENCOUNTER':
+          console.log(`[Game] Encounter event: ${event.name}`)
+          // Handle hostile encounters
+          if (event.data.hostile && event.data.damage) {
+            player.takeDamage(event.data.damage as number)
+            console.log(`[Game] Hostile encounter dealt ${event.data.damage} damage`)
+          }
+          // Handle friendly encounters (could open dialogue)
+          if (event.data.dialogueId) {
+            this.engine.pause()
+            UIEventManager.openOverlay('dialogue', {
+              dialogueId: event.data.dialogueId as string,
+            })
+          }
+          this.eventManager.completeEvent(event.id)
+          break
+
+        case 'ENVIRONMENTAL':
+          console.log(`[Game] Environmental event: ${event.name}`)
+          // Apply environmental effects
+          if (event.data.speedModifier) {
+            const modifier = event.data.speedModifier as number
+            const currentMax = player.getMaxSpeed()
+            player.setMaxSpeed(currentMax * modifier)
+            console.log(`[Game] Speed modified by ${modifier}x`)
+            // Reset after duration
+            if (event.data.duration) {
+              setTimeout(() => {
+                player.setMaxSpeed(5) // Reset to default
+              }, event.data.duration as number)
+            }
+          }
+          // Weather effects
+          if (event.data.weatherEffect) {
+            console.log(`[Game] Weather: ${event.data.weatherEffect}`)
+            // Could apply visual filters via renderer
+          }
+          this.eventManager.completeEvent(event.id)
+          break
+
+        default:
+          console.warn(`[Game] Unhandled event type: ${event.type}`)
+          this.eventManager.completeEvent(event.id)
+      }
+    })
   }
 
   /**
@@ -430,6 +688,24 @@ export class Game {
         this.renderer.removeEntitySprite(this.currentFork.id)
         this.engine.removeEntity(this.currentFork.id)
         this.currentFork = null
+      }
+
+      // Check for triggered events (Phase 5 integration)
+      const stats = this.player.getStats()
+      const currentNode = this.navigationManager.getCurrentNode()
+
+      const gameContext: GameContext = {
+        currentLocation: currentNode?.id,
+        gameTime: this.gameTime,
+        distanceTraveled: stats.distance,
+        health: stats.health,
+        rations: stats.rations,
+        inventory: this.player.getInventory(),
+      }
+
+      const triggeredEvents = this.eventManager.checkTriggers(gameContext)
+      if (triggeredEvents.length > 0) {
+        this.handleTriggeredEvents(triggeredEvents)
       }
     }
 
@@ -526,6 +802,23 @@ export class Game {
       this.spawnWhirlpool()
       this.whirlpoolSpawnTimer = 0
     }
+
+    // Update particle effects
+    if (this.particleManager) {
+      this.particleManager.update(deltaTime)
+    }
+
+    // Update renderer effects (screen shake)
+    this.renderer.update(deltaTime)
+
+    // Update performance monitoring
+    performanceMonitor.update(deltaTime)
+    performanceMonitor.setEntityCount(this.engine.getAllEntities().length)
+    if (this.particleManager) {
+      performanceMonitor.setParticleCount(this.particleManager.getParticleCount())
+    }
+    const physics = this.engine.getPhysics()
+    performanceMonitor.setPhysicsBodyCount(physics.getAllBodyIds().length)
 
     // Check if player is dead
     if (!this.player.isAlive()) {
@@ -702,6 +995,13 @@ export class Game {
    */
   getPlayerStats() {
     return this.player ? this.player.getStats() : null
+  }
+
+  /**
+   * Get navigation manager (for map UI)
+   */
+  getNavigationManager() {
+    return this.navigationManager
   }
 
   /**

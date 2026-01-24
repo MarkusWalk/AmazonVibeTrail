@@ -10,6 +10,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
       '@engine': path.resolve(__dirname, './src/engine'),
       '@rendering': path.resolve(__dirname, './src/rendering'),
+      '@audio': path.resolve(__dirname, './src/audio'),
       '@ui': path.resolve(__dirname, './src/ui'),
       '@state': path.resolve(__dirname, './src/state'),
       '@data': path.resolve(__dirname, './src/data'),

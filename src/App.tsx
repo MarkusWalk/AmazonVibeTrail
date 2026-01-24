@@ -3,6 +3,13 @@ import { StateManager } from '@engine/core'
 import { Game } from '@engine/Game'
 import { PixiRenderer } from '@rendering/pixi'
 import { GameState } from '@models/index'
+import { Dashboard } from './ui/components/Dashboard'
+import { Dialogue } from './ui/components/Dialogue'
+import { Inventory } from './ui/components/Inventory'
+import { InteractiveMap } from './ui/components/Map'
+import { convertInventoryToItems } from '@data/items/itemDefinitions'
+import { UIEventManager, type UIOverlayType, type UIEventData } from './ui/UIEventManager'
+import type { QuickSlotItem, StatusEffect } from './ui/components/Dashboard'
 import './App.css'
 
 function App() {
@@ -14,7 +21,24 @@ function App() {
     distance: 0,
     combo: 0,
     speed: 0,
+    currentWeight: 0,
+    maxWeight: 100,
   })
+  const [playerInventory, setPlayerInventory] = useState<Map<string, number>>(new Map())
+  const [rations, setRations] = useState(100)
+  const [maxRations, setMaxRations] = useState(100)
+  const [direction, setDirection] = useState(180) // Facing south (downstream)
+  const [quickSlots] = useState<(QuickSlotItem | null)[]>([
+    { id: 'harpoon', name: 'Harpoon', icon: '🔱', count: 5 },
+    { id: 'health', name: 'Health Potion', icon: '🧪', count: 3 },
+    { id: 'map', name: 'Map', icon: '🗺️' },
+    null,
+    null,
+  ])
+  const [selectedSlot, setSelectedSlot] = useState(0)
+  const [statuses, setStatuses] = useState<StatusEffect[]>([])
+  const [currentOverlay, setCurrentOverlay] = useState<UIOverlayType>(null)
+  const [overlayData, setOverlayData] = useState<UIEventData | undefined>()
   const canvasContainerRef = useRef<HTMLDivElement>(null)
   const gameRef = useRef<Game | null>(null)
   const rendererRef = useRef<PixiRenderer | null>(null)
@@ -30,12 +54,19 @@ function App() {
       setGameState(newState)
     })
 
+    // Subscribe to UI overlay events
+    const unsubscribe = UIEventManager.subscribe((overlay, data) => {
+      setCurrentOverlay(overlay)
+      setOverlayData(data)
+    })
+
     // Transition to menu after boot
     setTimeout(() => {
       stateManager.setState(GameState.MENU)
     }, 1000)
 
     return () => {
+      unsubscribe()
       if (gameRef.current) {
         gameRef.current.destroy()
       }
@@ -124,7 +155,45 @@ function App() {
             distance: playerStats.distance,
             combo: playerStats.combo,
             speed: playerStats.speed,
+            currentWeight: playerStats.currentWeight,
+            maxWeight: playerStats.maxWeight,
           })
+
+          // Update direction (convert radians to degrees if needed)
+          const angle = playerStats.angle || 0
+          setDirection((angle * 180 / Math.PI) + 180) // Convert to compass degrees
+
+          // Update rations from player stats
+          setRations(playerStats.rations)
+          setMaxRations(playerStats.maxRations)
+
+          // Update inventory
+          const inventory = (gameRef.current as any).player?.getInventory()
+          if (inventory) {
+            setPlayerInventory(inventory)
+          }
+
+          // Update status effects based on player state
+          const newStatuses: StatusEffect[] = []
+          if (playerStats.speedBoostActive) {
+            newStatuses.push({
+              id: 'speed_boost',
+              name: 'Speed Boost',
+              icon: '⚡',
+              duration: playerStats.speedBoostRemaining / 1000,
+              type: 'buff'
+            })
+          }
+          if (playerStats.invincible) {
+            newStatuses.push({
+              id: 'invincible',
+              name: 'Invincible',
+              icon: '🛡️',
+              duration: playerStats.invincibilityRemaining / 1000,
+              type: 'buff'
+            })
+          }
+          setStatuses(newStatuses)
         }
       }
     }, 100)
@@ -155,6 +224,14 @@ function App() {
     }
     if (stateManagerRef.current) {
       stateManagerRef.current.setState(GameState.MENU)
+    }
+  }
+
+  const handleCloseOverlay = () => {
+    UIEventManager.closeOverlay()
+    // Resume game if it was paused
+    if (gameRef.current) {
+      gameRef.current.resume()
     }
   }
 
@@ -208,51 +285,99 @@ function App() {
 
         {gameState === GameState.RIVER && (
           <div className="river-screen">
-            <div className="game-stats">
-              <div className="stat">
-                <span className="stat-label">Score</span>
-                <span className="stat-value">{stats.score}</span>
-              </div>
-              <div className="stat">
-                <span className="stat-label">Lives</span>
-                <span className="stat-value">{'❤️'.repeat(stats.lives)}</span>
-              </div>
-              <div className="stat">
-                <span className="stat-label">Health</span>
-                <span
-                  className="stat-value"
+            <div className="game-canvas" ref={canvasContainerRef}></div>
+
+            <Dashboard
+              health={stats.health}
+              maxHealth={100}
+              rations={rations}
+              maxRations={maxRations}
+              direction={direction}
+              location={`Score: ${stats.score} | Distance: ${stats.distance}m`}
+              quickSlots={quickSlots}
+              selectedSlot={selectedSlot}
+              statuses={statuses}
+              onSlotClick={(index) => setSelectedSlot(index)}
+            />
+
+            {/* UI Overlays */}
+            {currentOverlay === 'dialogue' && overlayData && 'dialogueId' in overlayData && (
+              <Dialogue
+                dialogueId={overlayData.dialogueId as string}
+                onClose={handleCloseOverlay}
+              />
+            )}
+
+            {currentOverlay === 'map' && gameRef.current && (
+              <div style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                zIndex: 1000,
+                padding: '20px',
+              }}>
+                <button
+                  onClick={handleCloseOverlay}
                   style={{
-                    color:
-                      stats.health > 60
-                        ? '#90ee90'
-                        : stats.health > 30
-                          ? '#ffff00'
-                          : '#ff0000',
+                    position: 'absolute',
+                    top: '20px',
+                    right: '20px',
+                    padding: '10px 20px',
+                    fontSize: '16px',
+                    zIndex: 1001,
+                    background: '#333',
+                    color: 'white',
+                    border: '2px solid #666',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
                   }}
                 >
-                  {stats.health}
-                </span>
+                  Close Map ✕
+                </button>
+                <InteractiveMap
+                  mapGraph={gameRef.current.getNavigationManager().getMapGraph()}
+                  currentNodeId={gameRef.current.getNavigationManager().getCurrentNode()?.id || 'belem'}
+                  visitedNodeIds={gameRef.current.getNavigationManager().getVisitedNodes()}
+                  onNodeSelect={(nodeId) => {
+                    console.log(`[App] Selected node: ${nodeId}`)
+                  }}
+                  onPlotCourse={(nodeId) => {
+                    console.log(`[App] Plot course to: ${nodeId}`)
+                    gameRef.current?.getNavigationManager().setTarget(nodeId)
+                    handleCloseOverlay()
+                  }}
+                />
               </div>
-              <div className="stat">
-                <span className="stat-label">Distance</span>
-                <span className="stat-value">{stats.distance}m</span>
-              </div>
-              {stats.combo > 0 && (
-                <div className="stat combo">
-                  <span className="stat-label">Combo</span>
-                  <span className="stat-value" style={{ color: '#ffff00' }}>
-                    x{stats.combo}
-                  </span>
-                </div>
-              )}
-            </div>
+            )}
 
-            <div className="game-canvas" ref={canvasContainerRef}></div>
+            {currentOverlay === 'inventory' && (
+              <Inventory
+                isOpen={true}
+                onClose={handleCloseOverlay}
+                items={convertInventoryToItems(playerInventory)}
+                maxWeight={stats.maxWeight}
+                currentWeight={stats.currentWeight}
+                onUseItem={(itemId) => {
+                  console.log(`[App] Use item: ${itemId}`)
+                  // TODO: Implement item usage through game
+                  handleCloseOverlay()
+                }}
+                onDropItem={(itemId, quantity) => {
+                  console.log(`[App] Drop item: ${itemId} x${quantity}`)
+                  // TODO: Implement item dropping through game
+                }}
+              />
+            )}
 
             <div className="game-controls">
               <button onClick={handlePauseGame}>⏸️ Pause</button>
               <button onClick={handleResumeGame}>▶️ Resume</button>
               <button onClick={handleStopGame}>⏹️ Stop</button>
+              <button onClick={() => UIEventManager.openOverlay('map')}>🗺️ Map</button>
+              <button onClick={() => UIEventManager.openOverlay('inventory')}>🎒 Inventory</button>
             </div>
           </div>
         )}

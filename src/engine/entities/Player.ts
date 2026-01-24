@@ -19,6 +19,16 @@ export class Player extends Entity {
   private lives: number = 3
   private isDamaged: boolean = false
 
+  // Survival stats
+  private rations: number = 100
+  private maxRations: number = 100
+  private rationsConsumptionRate: number = 0.5 // Rations per second
+
+  // Inventory system
+  private inventory: Map<string, number> = new Map()
+  private maxWeight: number = 100
+  private currentWeight: number = 0
+
   // Tracking stats
   private distanceTraveled: number = 0
   private combo: number = 0
@@ -46,6 +56,14 @@ export class Player extends Entity {
     // Track distance traveled
     const speed = this.getCurrentSpeed()
     this.distanceTraveled += speed * (deltaTime / 1000)
+
+    // Consume rations over time
+    this.rations -= this.rationsConsumptionRate * (deltaTime / 1000)
+    if (this.rations < 0) {
+      this.rations = 0
+      // Low rations causes damage over time
+      this.takeDamage(0.1 * (deltaTime / 1000))
+    }
 
     // Update power-up timers
     if (this.speedBoostTimer > 0) {
@@ -319,27 +337,153 @@ export class Player extends Entity {
   }
 
   /**
+   * Get rations
+   */
+  getRations(): number {
+    return Math.max(0, this.rations)
+  }
+
+  /**
+   * Get max rations
+   */
+  getMaxRations(): number {
+    return this.maxRations
+  }
+
+  /**
+   * Add rations
+   */
+  addRations(amount: number): void {
+    this.rations = Math.min(this.maxRations, this.rations + amount)
+    console.log(`[Player] Added ${amount} rations. Total: ${this.rations}`)
+  }
+
+  /**
+   * Consume rations manually (e.g., for healing)
+   */
+  consumeRations(amount: number): boolean {
+    if (this.rations >= amount) {
+      this.rations -= amount
+      return true
+    }
+    return false
+  }
+
+  /**
+   * Add item to inventory
+   */
+  addItem(itemId: string, quantity: number = 1, weight: number = 1): boolean {
+    const totalWeight = weight * quantity
+    if (this.currentWeight + totalWeight > this.maxWeight) {
+      console.log(`[Player] Cannot add ${itemId}: inventory full`)
+      return false
+    }
+
+    const current = this.inventory.get(itemId) || 0
+    this.inventory.set(itemId, current + quantity)
+    this.currentWeight += totalWeight
+    console.log(`[Player] Added ${quantity}x ${itemId}. Total: ${current + quantity}`)
+    return true
+  }
+
+  /**
+   * Remove item from inventory
+   */
+  removeItem(itemId: string, quantity: number = 1, weight: number = 1): boolean {
+    const current = this.inventory.get(itemId) || 0
+    if (current < quantity) {
+      console.log(`[Player] Cannot remove ${itemId}: insufficient quantity`)
+      return false
+    }
+
+    const newQuantity = current - quantity
+    if (newQuantity === 0) {
+      this.inventory.delete(itemId)
+    } else {
+      this.inventory.set(itemId, newQuantity)
+    }
+    this.currentWeight -= weight * quantity
+    console.log(`[Player] Removed ${quantity}x ${itemId}. Remaining: ${newQuantity}`)
+    return true
+  }
+
+  /**
+   * Get item quantity
+   */
+  getItemQuantity(itemId: string): number {
+    return this.inventory.get(itemId) || 0
+  }
+
+  /**
+   * Has item in inventory
+   */
+  hasItem(itemId: string, quantity: number = 1): boolean {
+    return this.getItemQuantity(itemId) >= quantity
+  }
+
+  /**
+   * Get entire inventory
+   */
+  getInventory(): Map<string, number> {
+    return new Map(this.inventory)
+  }
+
+  /**
+   * Get current weight
+   */
+  getCurrentWeight(): number {
+    return this.currentWeight
+  }
+
+  /**
+   * Get max weight
+   */
+  getMaxWeight(): number {
+    return this.maxWeight
+  }
+
+  /**
    * Get all player stats
    */
   getStats(): {
     health: number
+    maxHealth: number
     lives: number
+    rations: number
+    maxRations: number
     distance: number
     combo: number
     maxCombo: number
     obstaclesAvoided: number
     collectiblesGathered: number
     speed: number
+    angle: number
+    speedBoostActive: boolean
+    speedBoostRemaining: number
+    invincible: boolean
+    invincibilityRemaining: number
+    currentWeight: number
+    maxWeight: number
   } {
     return {
       health: this.health,
+      maxHealth: this.maxHealth,
       lives: this.lives,
+      rations: this.getRations(),
+      maxRations: this.maxRations,
       distance: this.getDistanceTraveled(),
       combo: this.combo,
       maxCombo: this.maxCombo,
       obstaclesAvoided: this.obstaclesAvoided,
       collectiblesGathered: this.collectiblesGathered,
       speed: this.getCurrentSpeed(),
+      angle: this.angle,
+      speedBoostActive: this.speedBoostTimer > 0,
+      speedBoostRemaining: this.speedBoostTimer,
+      invincible: this.invincibilityTimer > 0,
+      invincibilityRemaining: this.invincibilityTimer,
+      currentWeight: this.currentWeight,
+      maxWeight: this.maxWeight,
     }
   }
 }

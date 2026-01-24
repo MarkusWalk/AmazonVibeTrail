@@ -18,6 +18,18 @@ export class PixiRenderer {
   private sprites: Map<string, PIXI.Container> = new Map()
   private isInitialized: boolean = false
 
+  // Screen shake properties
+  private shakeIntensity: number = 0
+  private shakeDuration: number = 0
+  private shakeRemaining: number = 0
+  private originalStageX: number = 0
+  private originalStageY: number = 0
+
+  // Performance tracking
+  private lastPositions: Map<string, { x: number; y: number; rotation: number }> =
+    new Map()
+  private updateThreshold: number = 0.1 // Only update if moved more than this
+
   constructor(private config: RendererConfig) {
     // Create PixiJS application
     this.app = new PIXI.Application()
@@ -201,15 +213,39 @@ export class PixiRenderer {
 
   /**
    * Update sprite position/rotation from entity
+   * Optimized: Only updates if entity has moved significantly
    */
   updateEntitySprite(entity: Entity): void {
     const sprite = this.sprites.get(entity.id)
     if (!sprite) return
 
     const pos = entity.getPosition()
+    const rotation = entity.getAngle()
+    const lastPos = this.lastPositions.get(entity.id)
+
+    // Check if entity has moved significantly
+    if (lastPos) {
+      const dx = Math.abs(pos.x - lastPos.x)
+      const dy = Math.abs(pos.y - lastPos.y)
+      const dr = Math.abs(rotation - lastPos.rotation)
+
+      // Skip update if movement is below threshold
+      if (
+        dx < this.updateThreshold &&
+        dy < this.updateThreshold &&
+        dr < 0.01
+      ) {
+        return
+      }
+    }
+
+    // Update sprite transform
     sprite.x = pos.x
     sprite.y = pos.y
-    sprite.rotation = entity.getAngle()
+    sprite.rotation = rotation
+
+    // Cache position for next frame
+    this.lastPositions.set(entity.id, { x: pos.x, y: pos.y, rotation })
   }
 
   /**
@@ -220,6 +256,7 @@ export class PixiRenderer {
     if (sprite) {
       sprite.destroy({ children: true })
       this.sprites.delete(entityId)
+      this.lastPositions.delete(entityId) // Clean up cached position
     }
   }
 
@@ -367,5 +404,61 @@ export class PixiRenderer {
    */
   getApp(): PIXI.Application {
     return this.app
+  }
+
+  /**
+   * Trigger screen shake effect
+   * @param intensity - How much to shake (pixels)
+   * @param duration - How long to shake (seconds)
+   */
+  shakeScreen(intensity: number = 10, duration: number = 0.3): void {
+    this.shakeIntensity = intensity
+    this.shakeDuration = duration
+    this.shakeRemaining = duration
+    this.originalStageX = this.app.stage.x
+    this.originalStageY = this.app.stage.y
+  }
+
+  /**
+   * Update screen shake effect
+   * @param deltaTime - Time elapsed in milliseconds
+   */
+  updateScreenShake(deltaTime: number): void {
+    if (this.shakeRemaining <= 0) {
+      // No shake active, ensure stage is at original position
+      if (this.app.stage.x !== this.originalStageX || this.app.stage.y !== this.originalStageY) {
+        this.app.stage.x = this.originalStageX
+        this.app.stage.y = this.originalStageY
+      }
+      return
+    }
+
+    const dt = deltaTime / 1000 // Convert to seconds
+    this.shakeRemaining -= dt
+
+    // Calculate shake offset based on remaining time
+    const shakePercent = this.shakeRemaining / this.shakeDuration
+    const currentIntensity = this.shakeIntensity * shakePercent
+
+    // Random offset
+    const offsetX = (Math.random() - 0.5) * currentIntensity * 2
+    const offsetY = (Math.random() - 0.5) * currentIntensity * 2
+
+    this.app.stage.x = this.originalStageX + offsetX
+    this.app.stage.y = this.originalStageY + offsetY
+
+    // Reset when done
+    if (this.shakeRemaining <= 0) {
+      this.app.stage.x = this.originalStageX
+      this.app.stage.y = this.originalStageY
+    }
+  }
+
+  /**
+   * Update renderer effects
+   * @param deltaTime - Time elapsed in milliseconds
+   */
+  update(deltaTime: number): void {
+    this.updateScreenShake(deltaTime)
   }
 }

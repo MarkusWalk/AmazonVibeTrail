@@ -23,6 +23,19 @@ export class PhysicsSystem {
 
     // Configure engine for better water-like physics
     this.engine.world.gravity.y = 0
+
+    // Performance optimizations
+    this.engine.positionIterations = 4 // Reduced from default 6
+    this.engine.velocityIterations = 3 // Reduced from default 4
+    this.engine.constraintIterations = 2 // Reduced from default 2
+
+    // Enable broad-phase collision detection (spatial partitioning)
+    const detector = Matter.Detector.create({
+      bodies: [],
+    })
+    this.engine.detector = detector
+
+    console.log('[PhysicsSystem] Optimizations enabled')
   }
 
   /**
@@ -261,5 +274,39 @@ export class PhysicsSystem {
       bodyCount: this.bodies.size,
       timestamp: this.engine.timing.timestamp,
     }
+  }
+
+  /**
+   * Enable or disable sleeping for a body (performance optimization)
+   */
+  setSleeping(id: string, enabled: boolean): void {
+    const body = this.bodies.get(id)
+    if (!body) return
+
+    Matter.Sleeping.set(body, enabled)
+  }
+
+  /**
+   * Set custom physics timing (for performance tuning)
+   */
+  setPhysicsQuality(quality: 'low' | 'medium' | 'high'): void {
+    switch (quality) {
+      case 'low':
+        this.engine.positionIterations = 2
+        this.engine.velocityIterations = 2
+        this.engine.constraintIterations = 1
+        break
+      case 'medium':
+        this.engine.positionIterations = 4
+        this.engine.velocityIterations = 3
+        this.engine.constraintIterations = 2
+        break
+      case 'high':
+        this.engine.positionIterations = 6
+        this.engine.velocityIterations = 4
+        this.engine.constraintIterations = 2
+        break
+    }
+    console.log(`[PhysicsSystem] Quality set to: ${quality}`)
   }
 }

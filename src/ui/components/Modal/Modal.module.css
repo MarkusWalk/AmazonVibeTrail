@@ -1,0 +1,142 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+  padding: 20px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal {
+  background: linear-gradient(to bottom, #2d1810, #1a0f0a);
+  border: 3px solid #8b6914;
+  border-radius: 12px;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  animation: slideIn 0.3s ease-out;
+  position: relative;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal.small {
+  width: 400px;
+  max-width: 90vw;
+}
+
+.modal.medium {
+  width: 600px;
+  max-width: 90vw;
+}
+
+.modal.large {
+  width: 900px;
+  max-width: 90vw;
+}
+
+.modal.fullscreen {
+  width: 95vw;
+  height: 95vh;
+  max-height: 95vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 2px solid rgba(139, 105, 20, 0.3);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), transparent);
+}
+
+.title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: bold;
+  color: #d4af37;
+  font-family: 'Georgia', serif;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.closeButton {
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px solid rgba(139, 69, 19, 0.6);
+  color: #e5e7eb;
+  font-size: 24px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+  line-height: 1;
+}
+
+.closeButton:hover {
+  background: rgba(139, 69, 19, 0.6);
+  border-color: #d4af37;
+  color: #ffffff;
+  transform: rotate(90deg);
+}
+
+.closeButton:active {
+  transform: rotate(90deg) scale(0.95);
+}
+
+.content {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+  color: #e5e7eb;
+}
+
+/* Custom scrollbar for modal content */
+.content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.content::-webkit-scrollbar-thumb {
+  background: rgba(139, 105, 20, 0.5);
+  border-radius: 4px;
+}
+
+.content::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 105, 20, 0.7);
+}
