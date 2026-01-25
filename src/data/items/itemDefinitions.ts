@@ -9,7 +9,7 @@ export const itemDefinitions: Record<string, Omit<InventoryItem, 'quantity'>> = 
   harpoon: {
     id: 'harpoon',
     name: 'Fishing Harpoon',
-    description: 'A sturdy harpoon for catching fish in the river',
+    description: 'A three-pronged iron harpoon with a hardwood shaft, designed for spearing river fish. Indigenous hunters taught you to aim below where the fish appears, accounting for water refraction. Essential for supplementing rations when meat runs low. The prongs are barbed to prevent fish from escaping once struck.',
     icon: '🔱',
     category: 'tool',
     rarity: 'common',
@@ -61,7 +61,7 @@ export const itemDefinitions: Record<string, Omit<InventoryItem, 'quantity'>> = 
   medicine: {
     id: 'medicine',
     name: 'Quinine Medicine',
-    description: 'Treats malaria and other tropical diseases',
+    description: 'Quinine extracted from cinchona bark - the miracle drug that made Amazon exploration possible. Without it, malaria killed most European explorers within weeks. Take at first sign of fever: chills, sweating, headache. Tastes incredibly bitter, but it will save your life. The indigenous peoples showed Jesuits this cure in the 1600s, changing the course of colonial history.',
     icon: '💊',
     category: 'consumable',
     rarity: 'uncommon',
@@ -93,7 +93,7 @@ export const itemDefinitions: Record<string, Omit<InventoryItem, 'quantity'>> = 
   rubber: {
     id: 'rubber',
     name: 'Rubber',
-    description: 'Valuable trade commodity from rubber trees',
+    description: 'Latex sap tapped from Hevea brasiliensis rubber trees. During the 1890s rubber boom, this white gold made Manaus wealthier than Paris overnight - opera houses were built in the jungle, champagne flowed like water. Rubber barons became fabulously rich while indigenous seringueiros (tappers) worked in brutal conditions. The boom ended when British smugglers stole seeds and created plantations in Asia. Still valuable for trade.',
     icon: '⚫',
     category: 'trade',
     rarity: 'uncommon',
@@ -199,7 +199,7 @@ export const itemDefinitions: Record<string, Omit<InventoryItem, 'quantity'>> = 
   gold_pan: {
     id: 'gold_pan',
     name: 'Gold Panning Dish',
-    description: 'Used to sift through river sediment for gold',
+    description: 'Shallow metal pan with ridged sides for separating gold from river sediment. Swirl water and gravel in circular motion - gold sinks to bottom while lighter material washes away. The Amazon\'s gold washes down from Andean mountains. Many prospectors spent decades searching for El Dorado with nothing but this simple tool, a canoe, and desperate hope. Technique requires patience and practice to master.',
     icon: '🥘',
     category: 'tool',
     rarity: 'uncommon',
@@ -209,7 +209,7 @@ export const itemDefinitions: Record<string, Omit<InventoryItem, 'quantity'>> = 
   machete: {
     id: 'machete',
     name: 'Machete',
-    description: 'Essential for cutting through jungle vegetation',
+    description: 'Heavy-bladed cutting tool with a 50cm blade, the machete is the most versatile survival tool in the Amazon. Use it to clear trails through dense vegetation, build shelter, harvest palm hearts, defend against snakes, and even paddle in emergencies. Indigenous peoples and settlers alike never venture into the jungle without one. Keep the blade sharp and oiled to prevent rust in the humid climate.',
     icon: '🔪',
     category: 'tool',
     rarity: 'common',
@@ -229,7 +229,7 @@ export const itemDefinitions: Record<string, Omit<InventoryItem, 'quantity'>> = 
   binoculars: {
     id: 'binoculars',
     name: 'Binoculars',
-    description: 'Spot wildlife and landmarks from a distance',
+    description: 'Brass and leather field binoculars with 8x magnification. Essential for spotting wildlife before they spot you - particularly useful for observing jaguars, caimans, and river dolphins without disturbing them. Also helps identify safe channels and dangerous rapids ahead. Naturalists and explorers consider these indispensable. Keep lenses dry and clean; humidity will fog them instantly.',
     icon: '🔭',
     category: 'tool',
     rarity: 'uncommon',
@@ -311,7 +311,7 @@ export const itemDefinitions: Record<string, Omit<InventoryItem, 'quantity'>> = 
   antidote: {
     id: 'antidote',
     name: 'Antivenom',
-    description: 'Cures poison from snake and spider bites',
+    description: 'Polyvalent antivenom effective against pit viper, coral snake, and wandering spider venom. Developed by Instituto Butantan in São Paulo after thousands of deaths. Must be administered within hours of bite or venom causes tissue necrosis, paralysis, and death. Always carry at least one vial - the Amazon has over 300 species of venomous creatures. Administer intramuscularly at first sign of swelling or numbness.',
     icon: '💉',
     category: 'consumable',
     rarity: 'rare',
@@ -343,7 +343,7 @@ export const itemDefinitions: Record<string, Omit<InventoryItem, 'quantity'>> = 
   cacao_pods: {
     id: 'cacao_pods',
     name: 'Cacao Pods',
-    description: 'Source of chocolate, valuable for trade',
+    description: 'Football-sized pods from Theobroma cacao ("food of the gods"). Inside, sweet white pulp surrounds precious cacao beans. Indigenous peoples used these as currency for thousands of years before Europeans arrived. The beans must be fermented, dried, and roasted to develop chocolate flavor. A single pod contains 30-50 beans. Highly valuable in European markets where chocolate is consumed by royalty and the wealthy elite.',
     icon: '🍫',
     category: 'trade',
     rarity: 'uncommon',
@@ -385,7 +385,7 @@ export const itemDefinitions: Record<string, Omit<InventoryItem, 'quantity'>> = 
   blessing_amulet: {
     id: 'blessing_amulet',
     name: "Missionary's Blessing Amulet",
-    description: 'Provides protection and luck, small health regeneration',
+    description: 'Simple wooden cross on a leather cord, blessed by Father Miguel at the riverside mission. He claims it carries divine protection for those traveling dangerous waters. Whether through faith or placebo effect, wearing it seems to improve your luck and vitality. The priest whispered prayers over it for an hour, anointing it with sacred oil. Local river travelers swear such blessings have saved lives during storms and pirate attacks.',
     icon: '✝️',
     category: 'quest',
     rarity: 'rare',
@@ -395,7 +395,7 @@ export const itemDefinitions: Record<string, Omit<InventoryItem, 'quantity'>> = 
   sacred_herb_pouch: {
     id: 'sacred_herb_pouch',
     name: 'Sacred Herb Pouch',
-    description: 'Gift from indigenous elder, slowly restores health',
+    description: 'Woven palm fiber pouch containing a mixture of medicinal plants known only to the village elder - bark shavings, dried roots, mysterious leaves. The elder spent days preparing this sacred medicine, chanting ancestral prayers over each ingredient. Wear it around your neck; the aromatic compounds slowly absorb through skin, promoting healing and vitality. Indigenous shamans guard such knowledge jealously - you are honored to receive this gift. It marks you as a friend to their people.',
     icon: '👝',
     category: 'quest',
     rarity: 'rare',
@@ -405,7 +405,7 @@ export const itemDefinitions: Record<string, Omit<InventoryItem, 'quantity'>> = 
   pirate_treasure_map: {
     id: 'pirate_treasure_map',
     name: 'Pirate Treasure Map',
-    description: 'Map showing the location of buried pirate treasure',
+    description: 'Stained, water-damaged parchment covered in crude drawings and Portuguese annotations. X marks a location on an unnamed tributary island. River pirates operated throughout the 1800s, raiding rubber shipments and merchant boats, burying their ill-gotten gold to avoid authorities. Most died violently before retrieving their loot. This map - if genuine - could lead to a fortune in gold doubloons, stolen gems, and contraband. Or it could be an elaborate ruse. Only one way to find out...',
     icon: '🗺️',
     category: 'quest',
     rarity: 'legendary',

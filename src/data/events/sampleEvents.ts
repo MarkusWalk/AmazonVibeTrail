@@ -52,7 +52,7 @@ export const sampleEvents: GameEvent[] = [
   {
     id: 'rapids_hazard',
     name: 'Dangerous Rapids',
-    description: 'You encounter treacherous rapids!',
+    description: 'The river roars ahead like thunder! White water crashes over jagged rocks, churning the brown river into a frothing maelstrom. Your canoe pitches dangerously as the current accelerates, pulling you toward the chaos. You grip your paddle tightly - one wrong move and you could capsize!',
     type: EventType.HAZARD,
     trigger: {
       type: TriggerType.LOCATION,
@@ -72,7 +72,7 @@ export const sampleEvents: GameEvent[] = [
   {
     id: 'pink_dolphin_discovery',
     name: 'Pink River Dolphin Sighting',
-    description: 'A rare pink dolphin appears beside your canoe!',
+    description: 'A splash of water catches your eye! Surfacing mere meters from your canoe, a magnificent pink river dolphin - a boto - emerges from the murky depths. Its skin glows with an ethereal pink hue in the dappled sunlight. According to local legend, seeing one brings good fortune. The creature regards you with intelligent eyes before diving gracefully back into the river, leaving ripples in its wake. An extraordinary moment!',
     type: EventType.DISCOVERY,
     trigger: {
       type: TriggerType.RANDOM,
@@ -167,7 +167,7 @@ export const sampleEvents: GameEvent[] = [
   {
     id: 'pirate_ambush',
     name: 'River Pirate Ambush',
-    description: 'Pirates block your path demanding a toll',
+    description: 'Three weathered canoes suddenly burst from a concealed tributary, cutting off your escape! Armed men level rust-pitted rifles at you while their leader - a scarred figure with gold teeth gleaming in the sunlight - grins menacingly. The smell of unwashed bodies and desperation hangs in the humid air. These are river pirates, and they have you surrounded!',
     type: EventType.ENCOUNTER,
     trigger: {
       type: TriggerType.RANDOM,
@@ -227,7 +227,7 @@ export const sampleEvents: GameEvent[] = [
   {
     id: 'tropical_storm',
     name: 'Tropical Storm',
-    description: 'A sudden storm batters your canoe',
+    description: 'The sky darkens ominously as massive storm clouds roll in from the jungle, turning day into twilight. Wind whips the river into choppy waves, and the first fat raindrops splatter against your face. Then the deluge begins - a wall of water so thick you can barely see ten meters ahead! Thunder cracks like artillery fire as lightning illuminates the churning river. Your canoe rocks violently, taking on water as the storm batters you mercilessly. You must bail frantically to stay afloat!',
     type: EventType.HAZARD,
     trigger: {
       type: TriggerType.RANDOM,
@@ -303,7 +303,7 @@ export const sampleEvents: GameEvent[] = [
   {
     id: 'anaconda_encounter',
     name: 'Giant Anaconda',
-    description: 'A massive anaconda crosses your path',
+    description: 'Movement in the water! An enormous green anaconda - easily 6 meters long and as thick as a man\'s torso - glides across the river directly in your path. Its massive muscular body creates a wake as it swims, olive scales glistening wetly. The serpent\'s head rises from the water, tongue flicking as it senses your presence. These apex predators can crush a caiman in their coils. Your heart pounds as you realize you must navigate past this ancient predator!',
     type: EventType.HAZARD,
     trigger: {
       type: TriggerType.RANDOM,
@@ -325,7 +325,7 @@ export const sampleEvents: GameEvent[] = [
   {
     id: 'thick_fog',
     name: 'Dense Fog',
-    description: 'Thick fog descends on the river, reducing visibility',
+    description: 'A ghostly white mist rises from the river like ethereal smoke, thickening with each passing moment. Within minutes, visibility drops to almost nothing - you can barely see the bow of your own canoe! The fog is cold and clammy, muffling all sound except the gentle lap of water and the occasional mysterious splash in the murk. The riverbanks have vanished completely. You drift through a white void, disoriented and vulnerable. Navigation becomes a matter of instinct and prayer. Ancient river travelers called this "breath of the spirits" and considered it a dangerous omen.',
     type: EventType.ENVIRONMENTAL,
     trigger: {
       type: TriggerType.RANDOM,
@@ -344,7 +344,7 @@ export const sampleEvents: GameEvent[] = [
   {
     id: 'jaguar_sighting',
     name: 'Jaguar on the Riverbank',
-    description: 'A magnificent jaguar is spotted drinking at the river',
+    description: 'On the muddy riverbank ahead, you spot a magnificent jaguar emerging from the jungle shadows! The powerful cat moves with liquid grace, its golden coat decorated with distinctive black rosettes. Muscles ripple beneath its pelt as it approaches the water\'s edge to drink, completely unaware of your presence. This is the apex predator of the Amazon - el tigre - feared and revered by locals. You hold your breath, not daring to move, witnessing nature\'s perfect hunter in its element. An unforgettable sight!',
     type: EventType.DISCOVERY,
     trigger: {
       type: TriggerType.RANDOM,
@@ -383,7 +383,7 @@ export const sampleEvents: GameEvent[] = [
   {
     id: 'black_caiman_attack',
     name: 'Black Caiman Attack',
-    description: 'A black caiman lunges at your canoe',
+    description: 'Without warning, the water EXPLODES beside your canoe! A massive black caiman - over 4 meters of prehistoric fury - erupts from the depths, its jaws lined with rows of dagger-like teeth snapping mere inches from your boat! The largest predator in the Amazon river system, this ancient reptile is all muscle and aggression. Its armored hide is nearly black, camouflaging it perfectly in the dark water. The beast thrashes violently, trying to capsize your vessel. You must fend it off before it destroys your canoe!',
     type: EventType.HAZARD,
     trigger: {
       type: TriggerType.RANDOM,
@@ -402,7 +402,7 @@ export const sampleEvents: GameEvent[] = [
   {
     id: 'ancient_ruins_discovery',
     name: 'Hidden Ruins',
-    description: 'You discover ancient ruins hidden in the jungle',
+    description: 'Through a break in the dense jungle foliage, you glimpse something impossible - stone structures! Pulling your canoe to shore, you hack through vines and undergrowth to reveal ancient ruins, half-swallowed by the forest. Weathered stone blocks, fitted together with incredible precision, rise from the jungle floor. Intricate carvings cover the surfaces - geometric patterns, animal figures, symbols from a civilization long forgotten. Pottery shards litter the ground. This is evidence of the advanced pre-Columbian societies that thrived here centuries before the conquistadors arrived. An archaeological treasure!',
     type: EventType.DISCOVERY,
     trigger: {
       type: TriggerType.RANDOM,
@@ -422,7 +422,7 @@ export const sampleEvents: GameEvent[] = [
   {
     id: 'flash_flood',
     name: 'Flash Flood',
-    description: 'Rising waters threaten to capsize your canoe',
+    description: 'A distant roar grows louder - something terrible approaches! Upriver, a wall of brown water surges around the bend, carrying uprooted trees, debris, and foam. A flash flood from heavy rains in the highlands has sent a surge wave down the river! The water level rises with terrifying speed, the current accelerating to a churning torrent. Your canoe is caught in the maelstrom, spinning and bucking like a wild horse. Branches and logs hurtle past, any one of which could smash your fragile vessel to splinters. You must navigate through this chaos or be swept away!',
     type: EventType.HAZARD,
     trigger: {
       type: TriggerType.RANDOM,
@@ -599,7 +599,7 @@ export const sampleSpecimens: Specimen[] = [
     category: 'animal',
     rarity: 'legendary',
     description:
-      'The Amazon river dolphin, also known as boto, is one of the few freshwater dolphin species. Its pink coloration becomes more pronounced with age.',
+      'The Amazon river dolphin (boto) is one of only five freshwater dolphin species on Earth and the largest of them all. Adult males can reach 2.5 meters in length and weigh up to 185 kg. Their remarkable pink coloration - caused by blood vessels close to the skin surface - intensifies with age and during excitement. Unlike ocean dolphins, botos have unfused neck vertebrae allowing them to turn their heads 90 degrees, essential for navigating the flooded forests. Indigenous legends speak of botos transforming into handsome men to seduce young women during festivals. Listed as endangered due to pollution and hydroelectric dams threatening their habitat.',
     image: 'creature_dolphin_pink',
     value: 500,
   },
@@ -611,7 +611,7 @@ export const sampleSpecimens: Specimen[] = [
     category: 'animal',
     rarity: 'uncommon',
     description:
-      'A large, colorful parrot native to South America. Known for their bright red, yellow, and blue plumage.',
+      'The scarlet macaw is among the largest and most spectacular parrots in the world, reaching up to 90 cm in length, most of which is their impressive tail feathers. Their brilliant plumage - crimson red bodies with bright yellow wing patches and blue flight feathers - evolved to be visible through the forest canopy. These intelligent birds mate for life, often living 40-50 years in the wild. They use their powerful curved beaks to crack Brazil nuts and palm nuts that other animals cannot open. Indigenous peoples prized their feathers for ceremonial headdresses. Their loud raucous calls can be heard over a kilometer away as flocks fly overhead at dawn and dusk.',
     image: 'creature_macaw',
     value: 100,
   },
@@ -623,7 +623,7 @@ export const sampleSpecimens: Specimen[] = [
     category: 'plant',
     rarity: 'common',
     description:
-      "Cat's claw, a medicinal vine used by indigenous peoples for centuries to treat various ailments.",
+      'Uncaria tomentosa, known as uña de gato (cat\'s claw) for its curved thorns resembling feline claws, is a woody vine that can grow up to 30 meters climbing rainforest trees. Indigenous Amazonian tribes have used this plant medicinally for over 2000 years to treat arthritis, inflammation, stomach ulcers, and infections. The inner bark contains over 30 known medicinal compounds including powerful antioxidants. Modern pharmaceutical research has validated many traditional uses, finding anti-inflammatory, antiviral, and immune-boosting properties. Shamans prepare it by boiling the bark and root for hours, creating a bitter tea. In the 1990s, cat\'s claw became popular in Western herbal medicine, leading to overharvesting concerns. Sustainable cultivation is now encouraged to protect wild populations.',
     image: 'plant_herb',
     value: 25,
   },
@@ -647,7 +647,7 @@ export const sampleSpecimens: Specimen[] = [
     category: 'animal',
     rarity: 'rare',
     description:
-      'The largest cat in the Americas. A powerful predator that is an excellent swimmer.',
+      'Panthera onca - the jaguar - reigns as the largest and most powerful cat in the Americas, third largest in the world after tigers and lions. Males can weigh up to 160 kg of pure muscle. Unlike most cats, jaguars are exceptional swimmers and often hunt in water, taking caimans, turtles, and fish. Their name comes from the Native American word "yaguar" meaning "he who kills with one leap." Their bite is the strongest of all big cats relative to size - powerful enough to pierce turtle shells and crush skulls with a single bite to the head. Each jaguar\'s rosette pattern is unique like a fingerprint. Revered as sacred by ancient civilizations including the Maya and Aztec, who associated them with the underworld and the night sun. Now near-threatened due to habitat loss.',
     image: 'creature_jaguar',
     value: 300,
   },
@@ -659,7 +659,7 @@ export const sampleSpecimens: Specimen[] = [
     category: 'animal',
     rarity: 'uncommon',
     description:
-      'One of the largest snakes in the world. A non-venomous constrictor that lives in or near water.',
+      'The green anaconda is the heaviest snake in the world and one of the longest, with females growing up to 9 meters (30 feet) and weighing over 250 kg. Unlike pythons, anacondas are ovoviviparous, giving birth to live young - sometimes over 40 at once! These non-venomous constrictors are ambush predators, lying submerged in murky water with only their eyes and nostrils above the surface. Their prey includes capybaras, deer, caimans, and even jaguars on occasion. They kill by coiling around their victim and constricting until the prey suffocates. The name "anaconda" may derive from the Tamil word "anaikolra" meaning elephant killer. Local legends greatly exaggerate their size, with tales of 15-meter monsters that devour whole canoes.',
     image: 'creature_anaconda',
     value: 150,
   },
@@ -670,7 +670,7 @@ export const sampleSpecimens: Specimen[] = [
     category: 'artifact',
     rarity: 'rare',
     description:
-      'Pre-Columbian pottery shard with intricate geometric designs. Evidence of advanced indigenous civilizations.',
+      'This pottery shard dates from the pre-Columbian era, likely between 500-1500 CE, bearing intricate geometric designs and zoomorphic patterns characteristic of Marajoara or Tapajonic cultures. The sophisticated ceramic technology - including temperature-controlled firing, polychrome painting, and decorative appliqué - challenges old assumptions about "primitive" Amazonian societies. Archaeological evidence now suggests complex chiefdoms and possibly civilizations of over 100,000 people thrived in the Amazon before European contact. The devastating diseases brought by conquistadors (smallpox, measles, influenza) killed an estimated 90-95% of indigenous populations, erasing vast cultural knowledge. These pottery fragments are precious remnants of sophisticated societies that managed the forest sustainably for millennia, creating the anthropogenic "dark earth" (terra preta) still prized by farmers today. Each shard is a piece of a lost world.',
     image: 'artifact_pottery',
     value: 250,
   },
@@ -753,7 +753,7 @@ export const sampleSpecimens: Specimen[] = [
     category: 'animal',
     rarity: 'rare',
     description:
-      'Feather from the harpy eagle, one of the largest and most powerful eagles in the world.',
+      'The harpy eagle is the most powerful bird of prey in the Americas and one of the largest eagles on Earth. Females can weigh up to 9 kg with a wingspan exceeding 2 meters, though their wings are relatively short for forest maneuverability. Their talons are larger than a grizzly bear\'s claws - up to 13 cm long - capable of exerting over 500 pounds of pressure, enough to crush a monkey\'s skull instantly. They hunt from the canopy, snatching sloths, monkeys, and even small deer from treetops in spectacular aerial attacks. The distinctive double-crest of black feathers raises when alarmed. Named after the harpies of Greek mythology - half-woman, half-bird monsters. Indigenous peoples considered harpy eagle feathers sacred, using them only in the most important ceremonies. Now near-threatened due to deforestation destroying their hunting grounds. A breeding pair requires 25-30 square kilometers of primary forest.',
     image: 'creature_harpy_eagle',
     value: 180,
   },
@@ -830,7 +830,7 @@ export const sampleSpecimens: Specimen[] = [
     category: 'animal',
     rarity: 'rare',
     description:
-      'Actually a type of knifefish, capable of generating powerful electric shocks up to 600 volts.',
+      'Despite its name, the electric eel is not actually an eel but a type of knifefish more closely related to catfish. These remarkable creatures can generate three types of electrical discharge: low-voltage for navigation and communication in murky water, medium-voltage to stun prey, and high-voltage shocks up to 860 volts (though typically 600V) capable of stunning a horse or killing a human. They produce electricity through specialized cells called electrocytes - essentially biological batteries - that can discharge 80% of their 2-meter body simultaneously. They must surface to breathe air every 10 minutes despite having gills. Indigenous hunters traditionally drove horses into water to absorb the eels\' shocks until they tired, then safely captured them. Alexander von Humboldt witnessed this technique in 1800 and nearly died from shock himself studying these fish.',
     image: 'creature_electric_eel',
     value: 190,
   },
@@ -841,7 +841,7 @@ export const sampleSpecimens: Specimen[] = [
     category: 'plant',
     rarity: 'uncommon',
     description:
-      'Massive water lily with pads that can grow up to 3 meters in diameter and support significant weight.',
+      'Victoria amazonica is the largest water lily in the world, with circular pads reaching up to 3 meters in diameter. The underside features an intricate network of ribs radiating from the center - a natural architectural marvel that inspired the design of London\'s Crystal Palace in 1851. These reinforcing ribs can support up to 45 kg evenly distributed, enough for a small child to sit upon. The upturned rim (up to 20 cm high) prevents water from washing over the pad. Each night, the spectacular white flowers bloom and emit a pineapple-like fragrance to attract scarab beetles. On the second night, the flower turns pink and closes, trapping beetles inside to ensure pollination before dying. Named after Queen Victoria, this plant became a sensation in Victorian England when first successfully cultivated in 1849. Indigenous peoples traditionally used the enormous seeds - the size of peas - as food, popping them like popcorn.',
     image: 'plant_victoria_lily',
     value: 110,
   },
