@@ -465,7 +465,7 @@ export const sampleQuests: Quest[] = [
     id: 'healing_herbs_quest',
     name: 'Healing Herbs',
     description:
-      'The tribal shaman needs healing herbs from the rainforest. Collect 5 medicinal plants.',
+      'The tribal shaman\'s eyes grew distant as smoke from sacred herbs swirled between you. "The fever-sickness comes to our village," they whispered urgently. "Children burn with heat, elders grow weak. I need medicinal plants from the deep rainforest - the cat\'s claw vine that grows where jaguars mark their territory, the silver-leafed healing plant found only in shadow. Bring me five specimens, and I will prepare medicine to save my people. The spirits have shown me you are the one who can help." Time is running out - every day of delay means more suffering.',
     giver: 'npc_shaman',
     status: QuestStatus.AVAILABLE,
     objectives: [
@@ -497,7 +497,7 @@ export const sampleQuests: Quest[] = [
   {
     id: 'reach_manaus',
     name: 'Journey to Manaus',
-    description: 'Travel to the city of Manaus and explore its famous opera house.',
+    description: 'Manaus - the legendary "Paris of the Tropics" - rises from the jungle like a fever dream. During the rubber boom, this city became wealthier than European capitals overnight. Rubber barons built the Teatro Amazonas opera house, importing Italian marble, French chandeliers, and European performers to this remote jungle city. The old guide told you: "You haven\'t truly experienced the Amazon until you\'ve stood in that golden opera house, where Caruso once sang to an audience dressed in the finest silks while the jungle pressed against the walls outside. It is civilization\'s strangest triumph." Navigate the treacherous river to reach this impossible city.',
     status: QuestStatus.AVAILABLE,
     objectives: [
       {
@@ -533,7 +533,7 @@ export const sampleQuests: Quest[] = [
     id: 'wildlife_photographer',
     name: 'Wildlife Photography',
     description:
-      'Document the incredible wildlife of the Amazon. Photograph 10 different species.',
+      'Sarah Mitchell\'s camera clicked rapidly as she showed you her portfolio - jaguars mid-leap, macaws in flight, caimans exploding from water. "Future generations will only know these creatures through our photographs," she said, her enthusiasm tinged with sadness. "Deforestation, climate change... this Eden won\'t last forever. National Geographic wants a comprehensive wildlife survey - ten different species, properly documented. The pink dolphins, the harpy eagles, the electric eels... I need someone who knows the river to help find them. Will you help me capture this beauty before it vanishes?" She handed you a camera. The Amazon\'s biodiversity is staggering, but time is running out.',
     status: QuestStatus.AVAILABLE,
     objectives: [
       {
@@ -564,7 +564,7 @@ export const sampleQuests: Quest[] = [
   {
     id: 'survive_rapids',
     name: 'Rapids Survival',
-    description: 'Navigate through dangerous rapids without taking damage.',
+    description: 'You hear them before you see them - a distant roar like continuous thunder. The Rapids of Manaus have claimed countless lives over the centuries. Wooden crosses on the riverbank mark where canoes capsized, where dreams ended in churning white water and jagged rocks. The elderly guide warned you: "Only the most skilled paddlers survive the rapids without a scratch. It is not merely about strength, but reading the water, feeling the current\'s rhythm, knowing when to fight and when to surrender to the river\'s flow. Master this, and you master the Amazon itself." Prove your river skills by navigating through unscathed - no mistakes, no second chances.',
     status: QuestStatus.AVAILABLE,
     objectives: [
       {
@@ -946,7 +946,7 @@ const additionalQuests: Quest[] = [
   {
     id: 'rubber_collection_quest',
     name: 'The Rubber Baron\'s Contract',
-    description: 'Collect rubber for the baron',
+    description: 'The Rubber Baron leans back in his fine mahogany chair, imported from Portugal, and counts gold coins with manicured hands that have never touched a rubber tree. "White gold, my friend! That\'s what they call it! During the boom, we were richer than Rothschilds!" He gestures at his opulent mansion. "I need ten units of quality latex. The seringueiros are lazy - I need someone motivated. Bring me the rubber, and you\'ll have 100 gold pieces. Refuse..." He shrugs coldly. "...then you\'re just another nobody in the jungle." The rubber trade built empires on the backs of indigenous laborers. Will you participate in this brutal commerce?',
     status: QuestStatus.AVAILABLE,
     objectives: [
       {
@@ -970,7 +970,7 @@ const additionalQuests: Quest[] = [
   {
     id: 'botanical_specimens_quest',
     name: 'Scientific Discovery',
-    description: 'Help Dr. Santos collect rare specimens',
+    description: 'Dr. Helena Santos adjusts her round spectacles excitedly, her field journal filled with detailed sketches and notes. "The Amazon holds more plant and animal species than anywhere else on Earth! But we\'re losing them before science can even catalog them!" She shows you sketches: a scarlet macaw in flight, a pink boto breaching water, the magnificent Victoria amazonica lily. "I need specimens for the Royal Botanical Gardens. A scarlet macaw feather, evidence of boto sighting, and a Victoria lily sample. These will advance our understanding immeasurably! The university will fund further expeditions if we succeed!" Her passion for discovery is genuine. Help push the boundaries of scientific knowledge.',
     status: QuestStatus.AVAILABLE,
     objectives: [
       {
@@ -1017,7 +1017,7 @@ const additionalQuests: Quest[] = [
   {
     id: 'lost_expedition_quest',
     name: 'The Lost Expedition',
-    description: 'Find the remains of the lost Fawcett expedition',
+    description: 'In 1925, British explorer Colonel Percy Fawcett and his son disappeared into the Amazon searching for a lost city he called "Z" - believing ancient civilizations once thrived in the jungle. They were never seen again. An old prospector shows you a water-stained map with Fawcett\'s last known coordinates. "Hundreds have searched. Most never returned. But I found this journal page near Vilcabamba... his handwriting, I swear it! \'The city exists... the ruins are magnificent...\' it says. Then blood smears. Someone will solve this mystery eventually. Why not you?" The greatest archaeological mystery of the century awaits. Will you dare seek what Fawcett died searching for?',
     status: QuestStatus.AVAILABLE,
     objectives: [
       {
@@ -1055,7 +1055,7 @@ const additionalQuests: Quest[] = [
   {
     id: 'wildlife_photography_quest',
     name: 'Amazon Wildlife Portfolio',
-    description: 'Help Sarah Mitchell document rare Amazon wildlife',
+    description: 'Sarah Mitchell spreads her photographs across the canoe - each one a masterpiece of wildlife photography. "This jaguar took me three weeks to find. The giant otter family... I lived in a blind for a month. The scarlet macaws... I had to climb a 50-meter tree at dawn every day." She looks at you seriously. "National Geographic wants a comprehensive portfolio - the apex predators, the iconic species, the creatures that define the Amazon. But I can\'t cover enough territory alone. The jaguar hunts at dusk, the macaws feed at dawn, the otters are incredibly shy... I need a river expert to help locate them. Together, we can create something that will inspire the world to protect this place." Art meets science in the service of conservation.',
     status: QuestStatus.AVAILABLE,
     objectives: [
       {
@@ -1102,7 +1102,7 @@ const additionalQuests: Quest[] = [
   {
     id: 'pirate_revenge_quest',
     name: 'River Justice',
-    description: 'Stop the river pirates from raiding settlements',
+    description: 'A desperate merchant grabs your arm at the trading post. "The river pirates grow bolder! Last week they attacked three merchant boats, killed two traders, stole everything! The gold-toothed captain and his crew terrorize the whole region!" He shows you a wanted poster - crude drawings of scarred faces. "The authorities in Manaus offer 150 gold pieces for information leading to their capture. But getting that information..." He swallows nervously. "...means surviving encounters with them. Three documented confrontations should prove their patterns, their hideouts. You\'re brave enough to travel alone - brave enough to face them? Someone must stop these murderers before they kill again. Will you bring justice to the river?"',
     status: QuestStatus.AVAILABLE,
     objectives: [
       {
@@ -1140,7 +1140,7 @@ const additionalQuests: Quest[] = [
   {
     id: 'missionary_aid_quest',
     name: 'Mission of Mercy',
-    description: 'Help Father Miguel build a school for local children',
+    description: 'Father Miguel kneels in the dirt, sketching plans for a school building while indigenous children watch curiously. "These children deserve education, medical care, hope for the future," he says quietly. "But I am a priest, not a carpenter or doctor. I need tools - hammers, saws, nails to build the school. And medicine - quinine for malaria, bandages, antiseptics for the clinic." He looks up at you with tired but determined eyes. "The rubber barons exploit them, the settlers ignore them, disease kills them. Someone must help. God has placed this burden on my shoulders, but I cannot carry it alone. Will you aid this mission of mercy? Not for profit, but for humanity?"',
     status: QuestStatus.AVAILABLE,
     objectives: [
       {
@@ -1178,7 +1178,7 @@ const additionalQuests: Quest[] = [
   {
     id: 'gold_rush_quest',
     name: 'El Dorado Fever',
-    description: 'Search for gold in the ancient tributaries',
+    description: 'The Old Prospector spreads his ancient map across a boulder, fingers trembling with excitement and madness. "El Dorado! The City of Gold! It\'s REAL!" he insists feverishly. "The conquistadors searched in the wrong places! But I know... I KNOW it\'s up this tributary!" He points to unnamed waterways on the map. "First, prove yourself. Find five gold nuggets in the river sediment - it washes down from the Andes. Then locate the ancient treasure map - I heard rumors a missionary has part of it. With those, we\'ll have everything we need!" His eyes burn with three decades of obsession. "They called me mad! But we\'ll show them ALL!" Fortune or folly? Only one way to discover which.',
     status: QuestStatus.AVAILABLE,
     objectives: [
       {
@@ -1216,7 +1216,7 @@ const additionalQuests: Quest[] = [
   {
     id: 'indigenous_alliance_quest',
     name: 'Bridge of Cultures',
-    description: 'Build trust with the indigenous communities',
+    description: 'The Village Elder sets down their carving and regards you solemnly. "For five hundred years, outsiders have come to our land. The conquistadors brought disease and slavery. The rubber barons brought exploitation and death. The settlers bring destruction of the forest." They pause, studying your face. "But not all outsiders are the same. Some come to learn, to trade fairly, to respect our ways. Prove yourself different. Visit three villages along the river - not to take, but to understand. Complete five fair trades - offering value, not theft. Do this, and we will know your heart is good. We will share our knowledge, our medicine, our friendship. Build a bridge between your world and ours."',
     status: QuestStatus.AVAILABLE,
     objectives: [
       {
