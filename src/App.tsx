@@ -267,6 +267,13 @@ function App() {
       </div>
 
       <div className="app-content">
+        {/* Canvas container - always rendered but hidden when not in RIVER state */}
+        <div
+          className="game-canvas"
+          ref={canvasContainerRef}
+          style={{ display: gameState === GameState.RIVER ? 'block' : 'none' }}
+        ></div>
+
         {gameState === GameState.BOOT && (
           <div className="boot-screen">
             <div className="loading-spinner"></div>
@@ -307,7 +314,6 @@ function App() {
 
         {gameState === GameState.RIVER && (
           <div className="river-screen">
-            <div className="game-canvas" ref={canvasContainerRef}></div>
 
             <Dashboard
               health={stats.health}
