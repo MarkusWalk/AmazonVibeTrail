@@ -471,7 +471,7 @@ export const sampleQuests: Quest[] = [
     objectives: [
       {
         id: 'collect_herbs',
-        description: 'Collect medicinal plants',
+        description: 'Gather cat\'s claw vines and sacred healing herbs (5 specimens)',
         type: 'collect',
         target: 'plant_medicinal_herb',
         current: 0,
@@ -502,7 +502,7 @@ export const sampleQuests: Quest[] = [
     objectives: [
       {
         id: 'reach_manaus',
-        description: 'Reach Manaus',
+        description: 'Navigate the treacherous river to reach Manaus',
         type: 'reach',
         target: 'manaus',
         current: 0,
@@ -511,7 +511,7 @@ export const sampleQuests: Quest[] = [
       },
       {
         id: 'visit_opera_house',
-        description: 'Visit the Opera House',
+        description: 'Explore the magnificent Teatro Amazonas opera house',
         type: 'talk',
         target: 'opera_house_guide',
         current: 0,
@@ -538,7 +538,7 @@ export const sampleQuests: Quest[] = [
     objectives: [
       {
         id: 'photograph_species',
-        description: 'Photograph different species',
+        description: 'Document 10 different Amazon species for science',
         type: 'discover',
         target: 'any_creature',
         current: 0,
@@ -569,7 +569,7 @@ export const sampleQuests: Quest[] = [
     objectives: [
       {
         id: 'clear_rapids',
-        description: 'Navigate rapids safely',
+        description: 'Master the deadly rapids without taking any damage',
         type: 'survive',
         target: 'rapids_section',
         current: 0,
@@ -951,7 +951,7 @@ const additionalQuests: Quest[] = [
     objectives: [
       {
         id: 'collect_rubber',
-        description: 'Collect rubber latex',
+        description: 'Harvest white gold - rubber latex from Hevea trees (10 units)',
         type: 'collect',
         target: 'rubber',
         current: 0,
@@ -975,7 +975,7 @@ const additionalQuests: Quest[] = [
     objectives: [
       {
         id: 'find_macaw',
-        description: 'Find a scarlet macaw specimen',
+        description: 'Obtain brilliant red-yellow-blue feather from Ara macao',
         type: 'collect',
         target: 'creature_macaw',
         current: 0,
@@ -984,7 +984,7 @@ const additionalQuests: Quest[] = [
       },
       {
         id: 'find_dolphin',
-        description: 'Find a pink river dolphin specimen',
+        description: 'Document the legendary pink boto (Inia geoffrensis)',
         type: 'collect',
         target: 'creature_dolphin_pink',
         current: 0,
@@ -993,7 +993,7 @@ const additionalQuests: Quest[] = [
       },
       {
         id: 'find_lily',
-        description: 'Find Victoria amazonica water lily',
+        description: 'Collect sample from giant Victoria amazonica lily (3-meter pads)',
         type: 'collect',
         target: 'plant_victoria_lily',
         current: 0,
@@ -1022,7 +1022,7 @@ const additionalQuests: Quest[] = [
     objectives: [
       {
         id: 'reach_lost_city',
-        description: 'Reach the coordinates of the lost city',
+        description: 'Navigate to Fawcett\'s last known coordinates near Vilcabamba',
         type: 'reach',
         target: 'vilcabamba',
         current: 0,
@@ -1031,7 +1031,7 @@ const additionalQuests: Quest[] = [
       },
       {
         id: 'find_artifact',
-        description: 'Find an artifact from the expedition',
+        description: 'Discover blood-stained journal pages from 1925 expedition',
         type: 'discover',
         target: 'artifact_expedition_journal',
         current: 0,
@@ -1060,7 +1060,7 @@ const additionalQuests: Quest[] = [
     objectives: [
       {
         id: 'photograph_jaguar',
-        description: 'Photograph a jaguar',
+        description: 'Capture image of el tigre - apex predator Panthera onca',
         type: 'discover',
         target: 'creature_jaguar',
         current: 0,
@@ -1069,7 +1069,7 @@ const additionalQuests: Quest[] = [
       },
       {
         id: 'photograph_macaw',
-        description: 'Photograph a scarlet macaw',
+        description: 'Document mated pair of brilliant scarlet macaws in flight',
         type: 'discover',
         target: 'creature_macaw_scarlet',
         current: 0,
@@ -1078,7 +1078,7 @@ const additionalQuests: Quest[] = [
       },
       {
         id: 'photograph_otter',
-        description: 'Photograph a giant river otter',
+        description: 'Photograph endangered giant otter family (Pteronura brasiliensis)',
         type: 'discover',
         target: 'creature_otter_giant',
         current: 0,
@@ -1107,7 +1107,7 @@ const additionalQuests: Quest[] = [
     objectives: [
       {
         id: 'survive_pirate_encounters',
-        description: 'Survive pirate encounters',
+        description: 'Survive 3 encounters with the gold-toothed captain\'s crew',
         type: 'survive',
         target: 'pirate_encounter',
         current: 0,
@@ -1116,7 +1116,7 @@ const additionalQuests: Quest[] = [
       },
       {
         id: 'report_to_authorities',
-        description: 'Report to authorities in Manaus',
+        description: 'Provide intelligence to Manaus authorities for their capture',
         type: 'talk',
         target: 'manaus_authorities',
         current: 0,
@@ -1145,7 +1145,7 @@ const additionalQuests: Quest[] = [
     objectives: [
       {
         id: 'collect_tools',
-        description: 'Collect building tools',
+        description: 'Gather construction tools - hammers, saws, nails (5 tools)',
         type: 'collect',
         target: 'tools',
         current: 0,
@@ -1154,7 +1154,7 @@ const additionalQuests: Quest[] = [
       },
       {
         id: 'collect_medicine',
-        description: 'Collect medicine supplies',
+        description: 'Acquire medical supplies - quinine, bandages, antiseptics (10 units)',
         type: 'collect',
         target: 'medicine',
         current: 0,
@@ -1183,7 +1183,7 @@ const additionalQuests: Quest[] = [
     objectives: [
       {
         id: 'collect_gold_nuggets',
-        description: 'Collect gold nuggets',
+        description: 'Pan for Andean gold washing down the tributaries (5 nuggets)',
         type: 'collect',
         target: 'mineral_gold_nugget',
         current: 0,
@@ -1192,7 +1192,7 @@ const additionalQuests: Quest[] = [
       },
       {
         id: 'find_ancient_map',
-        description: 'Find an ancient treasure map',
+        description: 'Locate the ancient map rumored to show El Dorado\'s location',
         type: 'discover',
         target: 'artifact_treasure_map',
         current: 0,
@@ -1221,7 +1221,7 @@ const additionalQuests: Quest[] = [
     objectives: [
       {
         id: 'visit_villages',
-        description: 'Visit indigenous villages',
+        description: 'Journey to 3 villages along the river with respect and humility',
         type: 'reach',
         target: 'indigenous_village',
         current: 0,
@@ -1230,7 +1230,7 @@ const additionalQuests: Quest[] = [
       },
       {
         id: 'trade_fairly',
-        description: 'Complete fair trades',
+        description: 'Conduct 5 equitable trades - offering value, not exploitation',
         type: 'talk',
         target: 'village_traders',
         current: 0,
