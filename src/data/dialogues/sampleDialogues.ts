@@ -16,7 +16,7 @@ export const elderlyGuideDialogue: DialogueTree = {
       id: 'welcome',
       speaker: 'Elderly Guide',
       portrait: 'npc_guide_elderly',
-      text: 'Ah, a new traveler! Welcome to the mighty Amazon River. I have spent my entire life on these waters. What brings you to this wild frontier?',
+      text: 'Ah, a new traveler! *The elderly man adjusts his weathered straw hat, his sun-darkened face creasing with a warm smile.* Welcome to the mighty Amazon River - the great serpent of South America! I have spent my entire life on these waters, boy and man, nearly seventy years now. Every bend, every sandbar, every treacherous current... I know them all. So tell me, what brings you to this wild frontier, where the jungle meets the river and civilization feels like a distant dream?',
       choices: [
         {
           id: 'exploration',
@@ -39,7 +39,7 @@ export const elderlyGuideDialogue: DialogueTree = {
       id: 'explorer_path',
       speaker: 'Elderly Guide',
       portrait: 'npc_guide_elderly',
-      text: 'A noble pursuit! The Amazon holds countless mysteries. Be cautious of the rapids, and always respect the river. She can be generous, but also unforgiving.',
+      text: 'A noble pursuit indeed! *He nods approvingly, his eyes distant as if recalling his own youthful adventures.* The Amazon holds countless mysteries in her emerald embrace - lost cities swallowed by jungle, creatures science has yet to name, tribes who have never seen the outside world. But heed an old man\'s warning: be cautious of the rapids that thunder like gods, and always - ALWAYS - respect the river. She can be generous one moment, filling your nets with fish and guiding your canoe through calm waters. But cross her, and she becomes unforgiving, dragging men and boats down into her muddy depths without a second thought.',
       nextNodeId: 'advice',
     },
     {
@@ -112,7 +112,7 @@ export const merchantDialogue: DialogueTree = {
       id: 'greeting',
       speaker: 'River Merchant',
       portrait: 'npc_trader_merchant',
-      text: "Greetings, traveler! I am a merchant who trades along these waters. Looking to buy or sell? I have the finest goods from Belém to Iquitos!",
+      text: "*A robust man in a sweat-stained linen shirt waves enthusiastically from his larger supply canoe, which sits low in the water laden with crates and barrels.* Greetings, traveler! I am Rodrigo, a merchant who has traded these waters for fifteen years! *He gestures proudly at his wares, the smell of tobacco, spices, and leather wafting over the water.* Looking to buy or sell? I have the finest goods from the Atlantic port of Belém all the way to distant Iquitos in Peru! Medicine that actually works, tools that won't rust after a week, preserved foods that won't poison you - everything a smart adventurer needs to survive this green hell!",
       choices: [
         {
           id: 'browse',
@@ -194,7 +194,7 @@ export const shamanDialogue: DialogueTree = {
       id: 'greeting',
       speaker: 'Tribal Shaman',
       portrait: 'npc_shaman',
-      text: 'The spirits told me a traveler would come. You carry the weariness of the river. Do you seek healing, wisdom, or merely rest?',
+      text: '*An ancient figure emerges from the jungle shadows, adorned with feathers and intricate body paint. Smoke from burning herbs swirls around them, carrying the scent of unknown plants. Their eyes seem to pierce through you, seeing beyond the physical.* The spirits whispered to me three nights ago that a traveler would come from downriver. You carry the weariness of the river on your shoulders like a heavy burden - I can see it in your aura, the way the water spirits cling to you. *They tilt their head, studying you with an unnerving intensity.* Do you seek healing for your wounds, wisdom for your journey, or merely rest for your troubled soul?',
       choices: [
         {
           id: 'healing',
@@ -217,7 +217,7 @@ export const shamanDialogue: DialogueTree = {
       id: 'offer_healing',
       speaker: 'Tribal Shaman',
       portrait: 'npc_shaman',
-      text: 'The forest provides for those who respect it. I will prepare a healing remedy from sacred herbs. Rest here, and by morning you will feel renewed.',
+      text: '*The shaman nods solemnly and begins gathering leaves, bark, and roots from pouches hanging at their waist.* The forest provides for those who respect it and know its secrets. I will prepare a healing remedy from sacred herbs - the blood-red sap of the dragon tree, the silver leaves that grow only under the full moon, the root that the jaguar chews when wounded. *They begin crushing and mixing ingredients in a hollowed gourd, chanting in an ancient tongue.* This medicine has healed my people for a thousand years. Rest here by our fire, drink this when the stars appear, and by morning you will feel renewed - body, mind, and spirit.',
       nextNodeId: 'blessing',
       effect: {
         type: 'change_health',
@@ -473,7 +473,7 @@ export const riverPirateDialogue: DialogueTree = {
       id: 'ambush',
       speaker: 'River Pirate Captain',
       portrait: 'npc_pirate',
-      text: "Well, well, what do we have here? A lone traveler with a canoe full of goods! Hand over your valuables, and maybe we'll let you pass unharmed.",
+      text: "*Three weathered canoes emerge from a hidden tributary, cutting off your escape route. The lead boat carries a scarred man with gold teeth and a rusted cutlass. His crew - a motley collection of desperate-looking individuals - level old rifles in your direction. The captain's laugh is humorless and cold.* Well, well, what do we have here? A lone traveler with a canoe practically overflowing with goods! *He spits into the brown water.* Now, you seem like a reasonable person, so let's be reasonable. Hand over your valuables - gold, supplies, anything worth taking - and maybe, MAYBE, we'll let you pass unharmed. Resist, and... *He draws a finger across his throat meaningfully.* ...the piranhas will feast tonight.",
       choices: [
         {
           id: 'fight',
@@ -555,7 +555,7 @@ export const missionaryDialogue: DialogueTree = {
       id: 'warm_greeting',
       speaker: 'Father Miguel',
       portrait: 'npc_missionary',
-      text: 'Welcome, child! Our mission provides shelter to all travelers on this great river. You look weary from your journey. Will you rest here and share a meal with us?',
+      text: '*A kind-faced priest in simple white robes emerges from a modest wooden mission building, its cross visible above the door. The sound of children singing hymns drifts from inside. He wipes flour from his hands - he was apparently baking bread - and approaches with genuine warmth.* Welcome, child! *His Portuguese accent is thick but his smile is universal.* Our humble mission provides shelter to all travelers on this great river, regardless of faith or origin. God\'s love knows no boundaries, yes? *He looks at you with concern.* You look weary from your journey - I can see it in your eyes, the way you slump in your canoe. Please, will you rest here and share a meal with us? The children are making cassava bread, and we have fish stew that\'s actually quite good, if I may say so myself!',
       choices: [
         {
           id: 'accept_shelter',
@@ -648,7 +648,7 @@ export const goldProspectorDialogue: DialogueTree = {
       id: 'excited_encounter',
       speaker: 'Old Prospector',
       portrait: 'npc_prospector',
-      text: "You there! Have you seen any signs of gold in these waters? I've been searching for El Dorado for thirty years! It's real, I tell you, REAL!",
+      text: "*A wild-eyed old man with a tangled gray beard suddenly paddles alongside you, his rickety canoe filled with panning equipment, maps, and what appears to be thirty years of accumulated junk. His clothes are patched beyond recognition, and he smells like swamp water and obsession. He grabs the side of your canoe with surprising strength.* You there! *His eyes are feverish, intense.* Have you seen any signs of gold in these waters? Any glittering in the silt? Ancient stonework? Unusual rock formations? *He doesn't wait for an answer.* I've been searching for El Dorado for thirty years - THIRTY YEARS! Through fever, starvation, anaconda attacks, everything! And I'm close now, SO CLOSE! It's real, I tell you, REAL! *He fumbles with a tattered leather map.* The City of Gold exists, and I will find it before I die!",
       choices: [
         {
           id: 'humor_him',
@@ -744,7 +744,7 @@ export const indigenousElderDialogue: DialogueTree = {
       id: 'observant_greeting',
       speaker: 'Village Elder',
       portrait: 'npc_elder',
-      text: 'The river has brought you to our village. You are not the first outsider to travel these waters, and you will not be the last. What do you seek in our lands?',
+      text: '*A dignified elder sits on a log overlooking the river, surrounded by the sounds of village life - children playing, women weaving, men repairing nets. Their face is weathered like ancient bark, marked with traditional tattoos that tell stories of a lifetime. They don\'t look up immediately, continuing to carve a piece of wood with patient, practiced movements.* The river has brought you to our village. *Finally, they meet your eyes with a gaze that seems to see through pretense.* You are not the first outsider to travel these waters seeking fortune or knowledge, and you will not be the last. Some come with respect, others with greed. *They set down their carving.* So I ask you plainly: what do you seek in our ancestral lands?',
       choices: [
         {
           id: 'respectful_introduction',
@@ -841,7 +841,7 @@ export const portugueseExplorerDialogue: DialogueTree = {
       id: 'desperate_hail',
       speaker: 'Captain João Silva',
       portrait: 'npc_explorer',
-      text: "Thank the heavens! Another soul on this cursed river! I am Captain João Silva, and my expedition is lost. Our maps are useless here - the river changes like a living thing!",
+      text: "*A large Portuguese expedition boat appears around the bend, clearly in distress. The sails are torn, the hull shows damage from rocks, and the crew looks exhausted and feverish. An officer in a once-fine uniform, now stained with mud and sweat, waves frantically at you.* Thank the heavens! Another soul on this cursed river! *He shouts over the distance.* I am Captain João Silva of the Portuguese Crown Expedition, and we are hopelessly, completely, utterly LOST! *Frustration and desperation color his voice.* Our maps are useless here - the river changes like a living, breathing thing! Channels that existed last month are gone! Islands appear overnight! Even the stars seem different through this damned jungle canopy! *He runs a hand through his disheveled hair.* I am a navigator who has sailed from Lisbon to Goa, but this river... this river makes a fool of me!",
       choices: [
         {
           id: 'offer_help',
@@ -946,7 +946,7 @@ export const wildlifePhotographerDialogue: DialogueTree = {
       id: 'enthusiastic_greeting',
       speaker: 'Sarah Mitchell',
       portrait: 'npc_photographer',
-      text: "Oh wow, another river traveler! I'm Sarah Mitchell, wildlife photographer. This place is absolutely incredible! Have you seen the pink dolphins? The jaguars? I'm trying to document everything!",
+      text: "*A young woman in practical khaki clothing paddles up excitedly, her canoe loaded with camera equipment in waterproof cases. Her enthusiasm is infectious, and she's practically bouncing with energy despite the oppressive heat.* Oh wow, another river traveler! This is amazing! *She extends a hand enthusiastically.* I'm Sarah Mitchell, wildlife photographer from National Geographic! Well, freelance for them anyway. This place is absolutely, mind-blowingly INCREDIBLE! *She gestures wildly at the surrounding jungle.* I've been here for three months and I'm still discovering new species every week! Have you seen the pink dolphins? The boto? They're even more beautiful in person! And the jaguars - oh my god, the jaguars! I got footage of one hunting a caiman last week and nearly cried it was so magnificent! *She pauses for breath.* I'm trying to document everything - every bird, every mammal, every reptile. Future generations need to see what's here before it's... before it's gone.",
       choices: [
         {
           id: 'share_sightings',
