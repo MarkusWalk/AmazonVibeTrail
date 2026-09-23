@@ -1,17 +1,179 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="A modern recreation of the classic educational survival game 'The Amazon Trail'"
-    />
-    <title>Amazon Vibe Trail</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#102f2a" />
+  <meta name="description" content="A retro river expedition adventure inspired by classic educational trail games." />
+  <title>Riverbound: The Amazon Expedition</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%230b4433'/%3E%3Cpath d='M5 22c7-1 13-5 21-13-1 8-5 15-13 17-3 1-6-1-8-4Z' fill='%23b9db4b'/%3E%3Cpath d='M8 23c4-4 8-7 14-11' stroke='%23f2c14e' stroke-width='2'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="computer" id="game-root">
+    <header class="menu-bar">
+      <div class="program-title"><span class="mini-leaf">◆</span> RIVERBOUND</div>
+      <nav aria-label="Game menu">
+        <button type="button" id="new-game-btn"><u>F</u>ile</button>
+        <button type="button" data-open="map"><u>J</u>ourney</button>
+        <button type="button" data-open="album"><u>R</u>ecords</button>
+        <button type="button" id="sound-btn" aria-pressed="false"><u>S</u>ound: Off</button>
+      </nav>
+      <span class="clock" id="menu-clock">1993</span>
+    </header>
+
+    <section class="title-screen" id="start-screen">
+      <div class="title-art" aria-label="Amazon rainforest and river in pixel art">
+        <div class="title-logo">
+          <span>RIVERBOUND</span>
+          <h1>THE AMAZON<br>EXPEDITION</h1>
+          <p>A journey through the living rainforest</p>
+        </div>
+        <div class="title-menu">
+          <button type="button" id="show-setup-btn">Start a new expedition</button>
+          <button type="button" id="continue-btn" disabled>Continue expedition</button>
+          <button type="button" data-open="guide">Open field guide</button>
+        </div>
+        <div class="edition-stamp">EDUCATIONAL ADVENTURE • EDITION 2.0</div>
+      </div>
+
+      <form class="setup-window pixel-window" id="setup-form" hidden>
+        <div class="window-title"><span>Plan Your Expedition</span><button type="button" id="close-setup" aria-label="Close">×</button></div>
+        <div class="window-body">
+          <p>You are preparing to follow the Amazon from Manaus to Santarém. Who will lead the crew?</p>
+          <label for="captain-name">Expedition leader</label>
+          <input id="captain-name" maxlength="18" value="Dr. Walk" autocomplete="off" />
+          <fieldset>
+            <legend>Choose a specialty</legend>
+            <label class="radio-row"><input type="radio" name="role" value="naturalist" checked><span>Naturalist</span><small>Finds wildlife more easily</small></label>
+            <label class="radio-row"><input type="radio" name="role" value="medic"><span>Medic</span><small>Helps the crew recover</small></label>
+            <label class="radio-row"><input type="radio" name="role" value="navigator"><span>Navigator</span><small>Travels farther each day</small></label>
+          </fieldset>
+          <button class="bevel primary" type="submit">Begin the journey</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="play-screen" id="game-screen" hidden>
+      <div class="scene-frame">
+        <div class="danger-strip">
+          <span>♥</span><div class="danger-track"><i id="health-meter"></i></div><span>♥</span>
+        </div>
+        <div class="river-scene" id="scene">
+          <div class="scene-status">
+            <span id="weather-label">Clear • 31°C</span>
+            <span id="location-label">Leaving Manaus</span>
+          </div>
+          <div class="compass"><b id="weather-icon">☀</b><small>N</small></div>
+          <div class="scene-message" id="scene-message">
+            <span>THE JOURNEY BEGINS</span>
+            <h2>Beyond the meeting of waters</h2>
+            <p>Your canoe points east. The city fades behind a curtain of green.</p>
+          </div>
+        </div>
+      </div>
+
+      <section class="control-deck">
+        <div class="readout-panel">
+          <div class="readout-row">
+            <div><small>DAY</small><b id="day-number">1</b></div>
+            <div><small>LOCATION</small><b id="readout-location">Manaus</b></div>
+            <div><small>TO GO</small><b id="distance-label">1,340 km</b></div>
+          </div>
+          <div class="ticker"><span>FIELD NOTE:</span> <p id="field-note">Dark water often means fewer suspended sediments; pale water carries Andean silt.</p></div>
+        </div>
+
+        <div class="tool-row" aria-label="Expedition actions">
+          <button class="tool-button travel" type="button" data-action="travel"><span class="tool-icon">➤</span><b>Paddle</b></button>
+          <button class="tool-button" type="button" data-action="fish"><span class="tool-icon">ϟ</span><b>Fish</b></button>
+          <button class="tool-button" type="button" data-action="forage"><span class="tool-icon">♣</span><b>Explore</b></button>
+          <button class="tool-button" type="button" data-action="rest"><span class="tool-icon">☾</span><b>Camp</b></button>
+          <button class="tool-button" type="button" data-open="map"><span class="tool-icon">⌁</span><b>Map</b></button>
+          <button class="tool-button" type="button" data-open="supplies"><span class="tool-icon">▣</span><b>Supplies</b></button>
+          <button class="tool-button" type="button" data-open="album"><span class="tool-icon">▧</span><b>Album</b></button>
+          <button class="tool-button" type="button" data-open="guide"><span class="tool-icon">?</span><b>Guide</b></button>
+        </div>
+
+        <div class="crew-strip">
+          <div class="crew-card"><span id="role-symbol">✦</span><div><small id="leader-label">DR. WALK</small><b id="role-label">Naturalist</b><em id="crew-status">Crew in good spirits</em></div></div>
+          <div class="condition"><span>HEALTH <b id="health-value">100</b></span><span>MORALE <b id="morale-value">88</b></span><span>CANOE <b id="boat-value">100</b></span></div>
+          <div class="pace-box">
+            <small>TRAVEL PACE</small>
+            <div class="pace-controls">
+              <button type="button" data-pace="careful">Careful</button>
+              <button type="button" data-pace="steady" class="active">Steady</button>
+              <button type="button" data-pace="urgent">Fast</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <dialog id="map-dialog" class="pixel-dialog wide-dialog">
+    <form method="dialog"><div class="window-title"><span>River Map</span><button value="close" aria-label="Close">×</button></div>
+    <div class="window-body map-body">
+      <div class="map-river"><div class="river-line"></div><div class="route-progress" id="route-progress"></div><div class="boat-marker" id="boat-marker">▲</div><ol id="route-stops"></ol></div>
+      <p>The expedition follows 1,340 km of the lower Amazon toward Santarém.</p>
+      <button class="bevel" value="close">Return to the river</button>
+    </div></form>
+  </dialog>
+
+  <dialog id="supplies-dialog" class="pixel-dialog">
+    <form method="dialog"><div class="window-title"><span>Supplies on Hand</span><button value="close" aria-label="Close">×</button></div>
+    <div class="window-body">
+      <div class="supply-list">
+        <div><span class="supply-pic">▦</span><b>Food</b><output id="food-value">70</output><small>portions</small></div>
+        <div><span class="supply-pic">✚</span><b>Medicine</b><output id="medicine-value">6</output><small>kits</small></div>
+        <div><span class="supply-pic">◈</span><b>Fuel</b><output id="fuel-value">55</output><small>litres</small></div>
+        <div><span class="supply-pic">◇</span><b>Trade goods</b><output id="trade-value">8</output><small>bundles</small></div>
+      </div>
+      <button class="bevel" value="close">OK</button>
+    </div></form>
+  </dialog>
+
+  <dialog id="album-dialog" class="pixel-dialog wide-dialog">
+    <form method="dialog"><div class="window-title"><span>Wildlife Photo Album</span><button value="close" aria-label="Close">×</button></div>
+    <div class="window-body">
+      <div class="album-heading"><p>Species recorded during this expedition:</p><b id="journal-count">0 / 8</b></div>
+      <div class="journal-grid" id="journal-grid"></div>
+      <button class="bevel" value="close">Close album</button>
+    </div></form>
+  </dialog>
+
+  <dialog id="guide-dialog" class="pixel-dialog wide-dialog">
+    <form method="dialog"><div class="window-title"><span>Field Guide</span><button value="close" aria-label="Close">×</button></div>
+    <div class="window-body guide-copy">
+      <h2>How to survive the journey</h2>
+      <p><b>Paddle</b> to make progress. A faster pace covers more river, but consumes extra supplies and can damage the canoe.</p>
+      <p><b>Fish</b> or <b>Explore</b> to find food and document wildlife. <b>Camp</b> when the crew needs rest or repairs.</p>
+      <p>Open the map, supplies, and album at any time. Reaching Santarém with a healthy crew and a full album earns the highest score.</p>
+      <button class="bevel" value="close">I’m ready</button>
+    </div></form>
+  </dialog>
+
+  <dialog id="event-dialog" class="pixel-dialog event-dialog">
+    <form method="dialog">
+      <div class="window-title"><span id="event-kicker">River Encounter</span><button class="dialog-close" value="close" aria-label="Close">×</button></div>
+      <div class="window-body">
+        <h2 id="event-title">A choice on the water</h2>
+        <p id="event-copy"></p>
+        <div class="event-choices" id="event-choices"></div>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="end-dialog" class="pixel-dialog end-dialog">
+    <div class="window-title"><span id="end-kicker">Expedition Complete</span></div>
+    <div class="window-body">
+      <h2 id="end-title">Santarém at last</h2>
+      <p id="end-copy"></p>
+      <div class="score-grid" id="score-grid"></div>
+      <button class="bevel primary" id="play-again-btn" type="button">Plan another expedition</button>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
 </html>

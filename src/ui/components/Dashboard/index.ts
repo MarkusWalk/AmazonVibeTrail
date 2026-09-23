@@ -1,8 +1,0 @@
-export { Dashboard } from './Dashboard'
-export { Compass } from './Compass'
-export { HealthGauge } from './HealthGauge'
-export { RationsGauge } from './RationsGauge'
-export { QuickSlots } from './QuickSlots'
-export { StatusIndicators } from './StatusIndicators'
-export type { QuickSlotItem } from './QuickSlots'
-export type { StatusEffect } from './StatusIndicators'
