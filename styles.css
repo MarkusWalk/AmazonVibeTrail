@@ -25,7 +25,7 @@
 .river-scene.collision{animation:impact .38s steps(3)}
 @keyframes impact{0%,100%{transform:translateX(0);filter:none}25%{transform:translateX(-7px);filter:sepia(.8) brightness(1.4)}50%{transform:translateX(7px)}75%{transform:translateX(-3px)}}
 .scene-status,.compass,.scene-message{z-index:3}
-.scene-message{backdrop-filter:blur(2px)}
+.scene-message{right:auto;width:min(39%,390px);backdrop-filter:blur(2px)}
 .sighting{position:absolute;z-index:4;left:16%;top:29%;display:grid;grid-template-columns:40px auto;grid-template-rows:1fr 1fr;gap:0 6px;padding:5px 9px;color:#fff9c5;background:#173e31e8;border:2px solid #f3d773;box-shadow:3px 3px #081b15;text-align:left;animation:sighting-bob 2.3s ease-in-out infinite}
 .sighting>span{grid-row:1/3;align-self:center;font-size:31px;color:#f5df67}.sighting b{font:700 15px Georgia,serif}.sighting small{font-size:9px;letter-spacing:.07em;color:#b4ecd5}
 @keyframes sighting-bob{50%{transform:translateY(-6px)}}
@@ -50,5 +50,5 @@
 .fishing-water{position:relative;border:4px ridge #c6d4ca;line-height:0}.fishing-water canvas{width:100%;height:auto;cursor:crosshair;touch-action:none;image-rendering:pixelated}.fishing-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:12px;font-size:12px}.fishing-actions button{flex:none}
 #fishing-crosshair{display:none}
 .animal.found{background:radial-gradient(circle at 35% 20%,#5f9b72,#174e3c 70%);text-shadow:2px 2px #092a20}.animal.found:after{font-weight:700;line-height:1.15}
-@media(max-width:760px){.river-scene.moving{animation:none}.tool-row{grid-template-columns:repeat(3,1fr)}.tool-button{min-height:65px}.map-river{height:290px}.map-key{font-size:8px}#route-stops li{font-size:9px;padding:3px 4px}#route-stops li[data-stop="0"]{transform:translate(-95%,12px)}#route-stops li[data-stop="14"]{transform:translate(-5%,-3px)}.travel-hud{top:16%;width:72%}.sighting{left:7%;top:33%}}
+@media(max-width:760px){.river-scene.moving{animation:none}.scene-message{right:8px;width:auto}.tool-row{grid-template-columns:repeat(3,1fr)}.tool-button{min-height:65px}.map-river{height:290px}.map-key{font-size:8px}#route-stops li{font-size:9px;padding:3px 4px}#route-stops li[data-stop="0"]{transform:translate(-95%,12px)}#route-stops li[data-stop="14"]{transform:translate(-5%,-3px)}.travel-hud{top:16%;width:72%}.sighting{left:7%;top:33%}}
 @media(prefers-reduced-motion:reduce){.sighting{animation:none}.river-scene.moving,.river-scene.mist-arrival .mist-layer{animation:none}}
