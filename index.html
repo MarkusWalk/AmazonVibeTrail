@@ -7,7 +7,7 @@
   <meta name="description" content="A retro river expedition adventure inspired by classic educational trail games." />
   <title>Riverbound: The Amazon Expedition</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%230b4433'/%3E%3Cpath d='M5 22c7-1 13-5 21-13-1 8-5 15-13 17-3 1-6-1-8-4Z' fill='%23b9db4b'/%3E%3Cpath d='M8 23c4-4 8-7 14-11' stroke='%23f2c14e' stroke-width='2'/%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="styles.css?v=3" />
+  <link rel="stylesheet" href="styles.css?v=4" />
 </head>
 <body>
   <main class="computer" id="game-root">
@@ -34,13 +34,13 @@
           <button type="button" id="continue-btn" disabled>Continue expedition</button>
           <button type="button" data-open="guide">Open field guide</button>
         </div>
-        <div class="edition-stamp">EDUCATIONAL ADVENTURE • EDITION 2.0</div>
+        <div class="edition-stamp">A RIVERBOUND ADVENTURE • EDITION 3.0</div>
       </div>
 
       <form class="setup-window pixel-window" id="setup-form" hidden>
         <div class="window-title"><span>Plan Your Expedition</span><button type="button" id="close-setup" aria-label="Close">×</button></div>
         <div class="window-body">
-          <p>You are preparing to follow the Amazon from Manaus to Santarém. Who will lead the crew?</p>
+          <p>From Belém, follow the Amazon upriver through mist and history toward a hidden city in the Andes. Who will lead the crew?</p>
           <label for="captain-name">Expedition leader</label>
           <input id="captain-name" maxlength="18" value="Dr. Walk" autocomplete="off" />
           <fieldset>
@@ -60,15 +60,21 @@
           <span>♥</span><div class="danger-track"><i id="health-meter"></i></div><span>♥</span>
         </div>
         <div class="river-scene" id="scene">
+          <canvas id="river-canvas" aria-hidden="true"></canvas>
+          <div class="weather-layer" id="weather-layer" aria-hidden="true"></div>
+          <div class="mist-layer" aria-hidden="true"></div>
           <div class="scene-status">
             <span id="weather-label">Clear • 31°C</span>
             <span id="location-label">Leaving Manaus</span>
           </div>
           <div class="compass"><b id="weather-icon">☀</b><small>N</small></div>
+          <button type="button" class="sighting" id="sighting-btn" hidden><span id="sighting-icon">◈</span><b id="sighting-name">Wildlife!</b><small>CLICK TO PHOTOGRAPH</small></button>
+          <div class="travel-hud" id="travel-hud" hidden><b>STEER THE CANOE</b><span>← → / A D or drag</span><div class="travel-bar"><i id="travel-progress"></i></div></div>
+          <div class="steer-controls" id="steer-controls" hidden><button type="button" id="steer-left" aria-label="Steer left">◀</button><button type="button" id="steer-right" aria-label="Steer right">▶</button></div>
           <div class="scene-message" id="scene-message">
             <span>THE JOURNEY BEGINS</span>
-            <h2>Beyond the meeting of waters</h2>
-            <p>Your canoe points east. The city fades behind a curtain of green.</p>
+            <h2>The river begins at Belém</h2>
+            <p>Your canoe points west, upriver. The Atlantic breeze falls behind a curtain of green.</p>
           </div>
         </div>
       </div>
@@ -78,9 +84,9 @@
           <div class="readout-row">
             <div><small>DAY</small><b id="day-number">1</b></div>
             <div><small>LOCATION</small><b id="readout-location">Manaus</b></div>
-            <div><small>TO GO</small><b id="distance-label">1,340 km</b></div>
+            <div><small>UPRIVER</small><b id="distance-label">0 km</b></div>
           </div>
-          <div class="ticker"><span>FIELD NOTE:</span> <p id="field-note">Dark water often means fewer suspended sediments; pale water carries Andean silt.</p></div>
+          <div class="ticker"><span>FIELD NOTE:</span> <p id="field-note">The Amazon reaches the Atlantic in a vast, island-studded estuary.</p></div>
         </div>
 
         <div class="tool-row" aria-label="Expedition actions">
@@ -88,6 +94,7 @@
           <button class="tool-button" type="button" data-action="fish"><span class="tool-icon">ϟ</span><b>Fish</b></button>
           <button class="tool-button" type="button" data-action="forage"><span class="tool-icon">♣</span><b>Explore</b></button>
           <button class="tool-button" type="button" data-action="rest"><span class="tool-icon">☾</span><b>Camp</b></button>
+          <button class="tool-button" type="button" data-action="camera"><span class="tool-icon">▣</span><b>Camera</b></button>
           <button class="tool-button" type="button" data-open="map"><span class="tool-icon">⌁</span><b>Map</b></button>
           <button class="tool-button" type="button" data-open="supplies"><span class="tool-icon">▣</span><b>Supplies</b></button>
           <button class="tool-button" type="button" data-open="album"><span class="tool-icon">▧</span><b>Album</b></button>
@@ -113,8 +120,8 @@
   <dialog id="map-dialog" class="pixel-dialog wide-dialog">
     <form method="dialog"><div class="window-title"><span>River Map</span><button value="close" aria-label="Close">×</button></div>
     <div class="window-body map-body">
-      <div class="map-river"><div class="river-line"></div><div class="route-progress" id="route-progress"></div><div class="boat-marker" id="boat-marker">▲</div><ol id="route-stops"></ol></div>
-      <p>The expedition follows 1,340 km of the lower Amazon toward Santarém.</p>
+      <div class="map-river"><svg class="route-svg" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true"><path id="route-back" d="M 867 285 C 830 270 810 290 768 300 S 698 317 667 306 S 610 286 570 280 S 510 245 470 236 S 420 231 382 240 S 332 245 305 238 S 270 235 246 240 S 212 247 186 259 S 165 291 151 325 S 128 366 130 403 S 147 448 161 485"/><path id="route-done" d="M 867 285 C 830 270 810 290 768 300 S 698 317 667 306 S 610 286 570 280 S 510 245 470 236 S 420 231 382 240 S 332 245 305 238 S 270 235 246 240 S 212 247 186 259 S 165 291 151 325 S 128 366 130 403 S 147 448 161 485"/><g id="map-dots"></g><g id="map-boat" transform="translate(867 285)"><circle r="13" fill="#172f26" stroke="#ffe183" stroke-width="3"/><path d="M -6 5 L 0 -8 L 6 5 Z" fill="#ffe183"/></g></svg><ol id="route-stops"></ol><div class="map-key">ATLANTIC → AMAZON → ANDES</div></div>
+      <p id="map-caption">An illustrated river chart, not a navigational map. Blue mist marks each new chapter.</p>
       <button class="bevel" value="close">Return to the river</button>
     </div></form>
   </dialog>
@@ -125,7 +132,7 @@
       <div class="supply-list">
         <div><span class="supply-pic">▦</span><b>Food</b><output id="food-value">70</output><small>portions</small></div>
         <div><span class="supply-pic">✚</span><b>Medicine</b><output id="medicine-value">6</output><small>kits</small></div>
-        <div><span class="supply-pic">◈</span><b>Fuel</b><output id="fuel-value">55</output><small>litres</small></div>
+        <div><span class="supply-pic">◈</span><b>Lantern oil</b><output id="fuel-value">55</output><small>flasks</small></div>
         <div><span class="supply-pic">◇</span><b>Trade goods</b><output id="trade-value">8</output><small>bundles</small></div>
       </div>
       <button class="bevel" value="close">OK</button>
@@ -145,9 +152,9 @@
     <form method="dialog"><div class="window-title"><span>Field Guide</span><button value="close" aria-label="Close">×</button></div>
     <div class="window-body guide-copy">
       <h2>How to survive the journey</h2>
-      <p><b>Paddle</b> to make progress. A faster pace covers more river, but consumes extra supplies and can damage the canoe.</p>
-      <p><b>Fish</b> or <b>Explore</b> to find food and document wildlife. <b>Camp</b> when the crew needs rest or repairs.</p>
-      <p>Open the map, supplies, and album at any time. Reaching Santarém with a healthy crew and a full album earns the highest score.</p>
+      <p><b>Paddle</b> upriver. Steer with ← →, A/D, touch buttons, or drag to avoid logs and whirlpools. Faster pace means more distance and more risk.</p>
+      <p><b>Fish</b> to open the harpoon challenge. <b>Explore</b> for food and field observations. <b>Camera</b> photographs a visible animal. <b>Camp</b> to rest and repair.</p>
+      <p>The map traces Belém to the upper river and Vilcabamba. Mist appears at new landmarks. Trade, document wildlife, and keep the crew healthy along the way. Sound starts after beginning an expedition and can be muted in the menu.</p>
       <button class="bevel" value="close">I’m ready</button>
     </div></form>
   </dialog>
@@ -163,10 +170,15 @@
     </form>
   </dialog>
 
+  <dialog id="fishing-dialog" class="pixel-dialog wide-dialog fishing-dialog">
+    <div class="window-title"><span>Fishing • Harpoon</span><button type="button" id="close-fishing" aria-label="Close">×</button></div>
+    <div class="window-body"><p>Aim for the moving fish. Avoid the drifting log. One cast uses a day.</p><div class="fishing-water"><canvas id="fishing-canvas" width="640" height="280" aria-label="Fishing water with a moving target"></canvas><div id="fishing-crosshair">+</div></div><div class="fishing-actions"><span id="fishing-tip">Click the water or press SPACE to cast.</span><button type="button" class="bevel primary" id="cast-btn">Cast harpoon</button></div></div>
+  </dialog>
+
   <dialog id="end-dialog" class="pixel-dialog end-dialog">
     <div class="window-title"><span id="end-kicker">Expedition Complete</span></div>
     <div class="window-body">
-      <h2 id="end-title">Santarém at last</h2>
+      <h2 id="end-title">Vilcabamba at last</h2>
       <p id="end-copy"></p>
       <div class="score-grid" id="score-grid"></div>
       <button class="bevel primary" id="play-again-btn" type="button">Plan another expedition</button>
@@ -174,6 +186,6 @@
   </dialog>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="app.js?v=3"></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>
