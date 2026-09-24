@@ -170,6 +170,7 @@ function beginGame(saved = null) {
   $("#setup-form").hidden = true;
   initRoute();
   render();
+  if (saved) updateScene("Back on the river", `The crew resumes near ${STOPS[currentStop()].name}, ${Math.round(state.progress).toLocaleString()} km upriver from Belém.`);
   save();
   if (localStorage.getItem("riverbound-muted") !== "yes" && !audio) startAudio();
 }
